@@ -7,16 +7,51 @@
     <link rel="stylesheet" href="css/pc-style.css">
 </head>
 <body>
-    <h1>🖥️ Monitor Principal - Taller</h1>
+   <h1>🖥️ Monitor Principal - Taller</h1>
     
     <div id="panel-nivel">
         <h2 id="nivel-texto">Esperando datos del móvil...</h2>
-        
         <div id="nivel-tubo">
             <div class="marca marca-izq"></div>
             <div class="marca marca-der"></div>
             <div id="nivel-burbuja"></div>
         </div>
+    </div>
+
+    <div id="panel-tutorial" style="margin-top: 40px; background-color: #2d2d2d; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; gap: 20px; justify-content: space-around;">
+        
+        <div style="flex: 1; border: 2px solid #555; border-radius: 10px; padding: 20px;">
+            <h3>📖 Manual de Montaje</h3>
+            <div id="visor-manual" style="height: 200px; background-color: #111; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 10px;">
+                Paso 1: Medir madera
+            </div>
+            <p id="estado-manual" style="color: #aaa; margin-top: 10px;">Página 1 / 5</p>
+        </div>
+
+        <div style="flex: 1; border: 2px solid #555; border-radius: 10px; padding: 20px;">
+            <h3>▶️ Vídeo Explicativo</h3>
+            <div id="visor-video" style="height: 200px; background-color: #000; border: 4px solid #ff3333; display: flex; align-items: center; justify-content: center; font-size: 3em; border-radius: 10px;">
+                ⏸️ PAUSADO
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-voz" style="margin-top: 40px; background-color: #2d2d2d; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <h2>🎙️ Asistente de Voz</h2>
+        
+        <div>
+            <button id="btn-micro" style="padding: 15px 30px; font-size: 1.2em; background-color: #007bff; color: white; border: none; border-radius: 10px; cursor: pointer; margin-right: 10px;">
+                Activar Micrófono
+            </button>
+            <button id="btn-stop-micro" style="padding: 15px 30px; font-size: 1.2em; background-color: #555; color: white; border: none; border-radius: 10px; cursor: pointer; display: none;">
+                Detener
+            </button>
+        </div>
+        
+        <p style="font-size: 1.5em; color: #aaa;">He escuchado: <br> <i id="texto-escuchado">"..."</i></p>
+        
+        <div id="resultado-conversor" style="font-size: 3em; color: #ffcc00; font-weight: bold; margin-top: 20px;">
+            </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
