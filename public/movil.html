@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor de Taller</title>
+    <link rel="stylesheet" href="css/movil-style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📲 Sensor Nivelador</h1>
+        <p>Coloca el móvil sobre la pieza de madera.</p>
+        
+        <button id="start-btn">Activar Sensores</button>
+        
+        <div id="sensor-data" style="display: none;">
+            <h2>Inclinación: <span id="tilt-value">0</span>°</h2>
+            <p id="status">Enviando datos al PC...</p>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/movil-app.js"></script>
+</body>
+</html>

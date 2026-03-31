@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Taller - PC</title>
+    <link rel="stylesheet" href="css/pc-style.css">
+</head>
+<body>
+    <h1>🖥️ Monitor Principal - Taller</h1>
+    
+    <div id="panel-nivel">
+        <h2 id="nivel-texto">Esperando datos del móvil...</h2>
+        
+        <div id="nivel-tubo">
+            <div class="marca marca-izq"></div>
+            <div class="marca marca-der"></div>
+            <div id="nivel-burbuja"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/pc-app.js"></script>
+</body>
+</html>

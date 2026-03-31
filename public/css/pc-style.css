@@ -1,0 +1,60 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1e1e1e;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 50px;
+}
+
+#panel-nivel {
+    margin-top: 80px;
+    background-color: #2d2d2d;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+#nivel-texto {
+    font-size: 3em;
+    margin-bottom: 40px;
+    transition: color 0.3s;
+}
+
+#nivel-tubo {
+    width: 80%;
+    max-width: 800px;
+    height: 120px;
+    background-color: #111;
+    margin: 0 auto;
+    border-radius: 60px;
+    position: relative;
+    border: 8px solid #555;
+    overflow: hidden;
+    transition: border-color 0.3s;
+}
+
+#nivel-burbuja {
+    width: 100px;
+    height: 100px;
+    background-color: #ff3333; /* Rojo por defecto */
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    /* La colocamos en el centro exacto */
+    left: 50%;
+    transform: translateX(-50%);
+    transition: left 0.1s ease-out, background-color 0.3s;
+}
+
+/* Líneas que marcan el centro "perfecto" */
+.marca {
+    position: absolute;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    background-color: rgba(255,255,255,0.5);
+    z-index: 10;
+}
+.marca-izq { left: calc(50% - 60px); }
+.marca-der { left: calc(50% + 54px); }

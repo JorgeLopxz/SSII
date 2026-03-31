@@ -28,5 +28,5 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`\n--- Servidor de Taller Activo ---`);
     console.log(`-> Vista de PC:    http://localhost:${PORT}/pc.html`);
-    console.log(`-> Vista Móvil:    http://localhost:${PORT}/mobile.html`);
+    console.log(`-> Vista Móvil:    http://localhost:${PORT}/movil.html`);
 });
