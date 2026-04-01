@@ -7,52 +7,64 @@
     <link rel="stylesheet" href="css/pc-style.css">
 </head>
 <body>
-   <h1>🖥️ Monitor Principal - Taller</h1>
+   <main class="app-shell">
+    <header class="app-header">
+        <p class="eyebrow">Hands-Free Workshop Assistant</p>
+        <h1>Monitor Principal de Montaje</h1>
+        <p class="subtitle">Interacciones sin contacto para nivelado, guía de montaje y control por voz.</p>
+        <p><span id="estado-sensores" class="estado-sensores estado-sensor-offline">Sin sensores</span></p>
+    </header>
     
-    <div id="panel-nivel">
+    <section id="panel-nivel" class="panel panel-ruler">
         <h2 id="nivel-texto">Esperando datos del móvil...</h2>
         <div id="nivel-tubo">
             <div class="marca marca-izq"></div>
             <div class="marca marca-der"></div>
             <div id="nivel-burbuja"></div>
         </div>
-    </div>
+        <div class="controles-nivel">
+            <button id="btn-calibrar" class="btn-nivel">Calibrar 0°</button>
+            <button id="btn-reset-calibracion" class="btn-nivel btn-nivel-secundario">Reset calibración</button>
+        </div>
+    </section>
 
-    <div id="panel-tutorial" style="margin-top: 40px; background-color: #2d2d2d; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; gap: 20px; justify-content: space-around;">
+    <section id="panel-tutorial" class="panel panel-grid">
         
-        <div style="flex: 1; border: 2px solid #555; border-radius: 10px; padding: 20px;">
-            <h3>📖 Manual de Montaje</h3>
-            <div id="visor-manual" style="height: 200px; background-color: #111; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 10px;">
+        <article class="subpanel">
+            <h3><span class="icon-manual">📋</span> Manual de Montaje</h3>
+            <div id="visor-manual" class="visor visor-manual">
                 Paso 1: Medir madera
             </div>
-            <p id="estado-manual" style="color: #aaa; margin-top: 10px;">Página 1 / 5</p>
-        </div>
+            <p id="estado-manual" class="estado-subpanel">Página 1 / 5</p>
+        </article>
 
-        <div style="flex: 1; border: 2px solid #555; border-radius: 10px; padding: 20px;">
-            <h3>▶️ Vídeo Explicativo</h3>
-            <div id="visor-video" style="height: 200px; background-color: #000; border: 4px solid #ff3333; display: flex; align-items: center; justify-content: center; font-size: 3em; border-radius: 10px;">
+        <article class="subpanel">
+            <h3><span class="icon-video">▶</span> Vídeo Explicativo</h3>
+            <div id="visor-video" class="visor visor-video">
                 ⏸️ PAUSADO
             </div>
-        </div>
-    </div>
+        </article>
+    </section>
 
-    <div id="panel-voz" style="margin-top: 40px; background-color: #2d2d2d; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-        <h2>🎙️ Asistente de Voz</h2>
+    <section id="panel-voz" class="panel panel-wood">
+        <h2><span class="icon-mic">🎙</span> Asistente de Voz</h2>
+        <p><span id="estado-micro" class="estado-micro estado-idle">Micrófono apagado</span></p>
         
-        <div>
-            <button id="btn-micro" style="padding: 15px 30px; font-size: 1.2em; background-color: #007bff; color: white; border: none; border-radius: 10px; cursor: pointer; margin-right: 10px;">
+        <div class="acciones-voz">
+            <button id="btn-micro" class="btn btn-primary">
                 Activar Micrófono
             </button>
-            <button id="btn-stop-micro" style="padding: 15px 30px; font-size: 1.2em; background-color: #555; color: white; border: none; border-radius: 10px; cursor: pointer; display: none;">
+            <button id="btn-stop-micro" class="btn btn-secondary" style="display: none;">
                 Detener
             </button>
         </div>
         
-        <p style="font-size: 1.5em; color: #aaa;">He escuchado: <br> <i id="texto-escuchado">"..."</i></p>
+        <p class="texto-escuchado-wrap">He escuchado: <br> <i id="texto-escuchado">"..."</i></p>
+        <p id="voz-feedback" class="voz-feedback">Di un comando como "siguiente", "pausa" o "convierte 5 pulgadas a cm".</p>
         
-        <div id="resultado-conversor" style="font-size: 3em; color: #ffcc00; font-weight: bold; margin-top: 20px;">
-            </div>
-    </div>
+        <div id="resultado-conversor" class="resultado-conversor"></div>
+    </section>
+   </main>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/pc-app.js"></script>

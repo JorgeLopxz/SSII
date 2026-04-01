@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+:root {
+	--bg-0: #fbf6ed;
+	--bg-1: #f2e7d2;
+	--card: rgba(255, 250, 242, 0.9);
+	--card-border: rgba(138, 90, 45, 0.28);
+	--text-main: #35261a;
+	--text-soft: #6b5744;
+	--accent: #da7a2e;
+	--accent-2: #b6793f;
+	--ok: #2e8b57;
+	--danger: #b64635;
+	--shadow: 0 16px 32px rgba(95, 60, 33, 0.14);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+	color: var(--text-main);
+	background:
+		radial-gradient(1200px 500px at 15% -20%, rgba(218, 122, 46, 0.22), transparent 60%),
+		radial-gradient(900px 420px at 90% 120%, rgba(138, 90, 45, 0.16), transparent 70%),
+		linear-gradient(150deg, var(--bg-0), var(--bg-1));
+	display: grid;
+	place-items: center;
+	padding: 20px;
+}
+
+body::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	opacity: 0.12;
+	background-image:
+		linear-gradient(rgba(95, 60, 33, 0.2) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(95, 60, 33, 0.2) 1px, transparent 1px);
+	background-size: 28px 28px;
+}
+
+.container {
+	position: relative;
+	width: min(460px, 100%);
+	padding: 22px;
+	border-radius: 24px;
+	border: 1px solid var(--card-border);
+	background: var(--card);
+	box-shadow: var(--shadow);
+}
+
+.app-header {
+	margin-bottom: 20px;
+}
+
+.eyebrow {
+	margin: 0 0 8px;
+	font-family: 'Rajdhani', sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	font-size: 0.78rem;
+	color: #8a5a2d;
+}
+
+h1 {
+	margin: 0;
+	font-family: 'Rajdhani', sans-serif;
+	font-size: clamp(2rem, 6vw, 2.8rem);
+	line-height: 1;
+	letter-spacing: 0.02em;
+}
+
+.subtitle {
+	margin: 12px 0 0;
+	color: var(--text-soft);
+	line-height: 1.45;
+}
+
+.card {
+	border-radius: 18px;
+	border: 1px solid rgba(138, 90, 45, 0.24);
+	background: linear-gradient(145deg, rgba(255, 246, 232, 0.96), rgba(246, 232, 209, 0.92));
+	padding: 18px;
+}
+
+.setup-card {
+	margin-bottom: 16px;
+}
+
+#start-btn {
+	width: 100%;
+	border: 0;
+	border-radius: 14px;
+	padding: 14px 18px;
+	font-family: 'Rajdhani', sans-serif;
+	font-size: 1.15rem;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	color: #2f1b0f;
+	background: linear-gradient(90deg, var(--accent), #efaa68);
+	cursor: pointer;
+	box-shadow: 0 8px 18px rgba(201, 99, 21, 0.24);
+	transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+#start-btn:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 12px 20px rgba(201, 99, 21, 0.28);
+}
+
+#start-btn:active {
+	transform: translateY(1px) scale(0.995);
+}
+
+.reading-card {
+	text-align: center;
+}
+
+.reading-label {
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #8a5a2d;
+	font-size: 0.82rem;
+}
+
+.tilt-display {
+	margin-top: 10px;
+	display: inline-flex;
+	align-items: baseline;
+	gap: 4px;
+	padding: 8px 16px;
+	border-radius: 14px;
+	border: 1px solid rgba(182, 121, 63, 0.4);
+	background: rgba(255, 248, 236, 0.9);
+}
+
+#tilt-value {
+	font-family: 'Rajdhani', sans-serif;
+	font-size: clamp(3rem, 15vw, 5.2rem);
+	line-height: 1;
+	font-weight: 700;
+	color: #50341e;
+}
+
+.tilt-unit {
+	font-family: 'Rajdhani', sans-serif;
+	font-size: clamp(1.4rem, 6vw, 2rem);
+	color: #a86f3a;
+}
+
+.status-text {
+	margin: 14px 0 0;
+	font-weight: 600;
+	color: var(--ok);
+}
+
+.helper {
+	margin: 10px 0 0;
+	font-size: 0.9rem;
+	color: #796251;
+	line-height: 1.4;
+}
+
+.footer-note {
+	margin-top: 14px;
+	text-align: center;
+	font-size: 0.78rem;
+	color: #8a6a4d;
+}
+
+@media (max-width: 400px) {
+	.container {
+		padding: 16px;
+		border-radius: 18px;
+	}
+
+	.card {
+		padding: 14px;
+	}
+}

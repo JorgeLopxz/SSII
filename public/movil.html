@@ -8,15 +8,28 @@
 </head>
 <body>
     <div class="container">
-        <h1>📲 Sensor Nivelador</h1>
-        <p>Coloca el móvil sobre la pieza de madera.</p>
+        <header class="app-header">
+            <p class="eyebrow">Hands-Free Workshop</p>
+            <h1>Sensor Nivelador</h1>
+            <p class="subtitle">Coloca el móvil sobre la pieza de madera y activa los sensores.</p>
+        </header>
+
+        <section class="card setup-card">
+            <button id="start-btn">Activar Sensores</button>
+            <p class="helper">En iPhone, acepta el permiso de movimiento cuando aparezca.</p>
+        </section>
+
+        <section id="sensor-data" class="card reading-card" style="display: none;">
+            <p class="reading-label">Inclinación actual</p>
+            <div class="tilt-display">
+                <span id="tilt-value">0</span>
+                <span class="tilt-unit">°</span>
+            </div>
+            <p id="status" class="status-text">Enviando datos al PC...</p>
+            <p class="helper">Mantén el móvil estable unos segundos para una lectura más limpia.</p>
+        </section>
         
-        <button id="start-btn">Activar Sensores</button>
-        
-        <div id="sensor-data" style="display: none;">
-            <h2>Inclinación: <span id="tilt-value">0</span>°</h2>
-            <p id="status">Enviando datos al PC...</p>
-        </div>
+        <div class="footer-note">Modo sensor móvil conectado por Socket.IO</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
