@@ -1,16 +1,16 @@
-import { initFeedback } from './pc/feedback.js';
-import { initLevelModule } from './pc/level-module.js';
-import { createTutorialModule } from './pc/tutorial-module.js';
-import { initVoiceModule } from './pc/voice-module.js';
+import { inicializarRetroalimentacion } from './pc/retroalimentacion.js';
+import { inicializarModuloNivel } from './pc/modulo-nivel.js';
+import { crearModuloTutorial } from './pc/modulo-tutorial.js';
+import { inicializarModuloVoz } from './pc/modulo-voz.js';
 
 const bootstrap = async () => {
     const socket = io();
 
-    initFeedback();
-    initLevelModule(socket);
+    inicializarRetroalimentacion();
+    inicializarModuloNivel(socket);
 
-    const tutorialApi = await createTutorialModule();
-    initVoiceModule(tutorialApi);
+    const apiTutorial = await crearModuloTutorial();
+    inicializarModuloVoz(apiTutorial);
 };
 
 bootstrap();

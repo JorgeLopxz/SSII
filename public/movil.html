@@ -14,22 +14,22 @@
             <p class="subtitle">Coloca el móvil sobre la pieza de madera y activa los sensores.</p>
         </header>
 
-        <section class="card setup-card">
-            <button id="start-btn">Activar Sensores</button>
+        <section class="card tarjeta-configuracion">
+            <button id="btn-iniciar-sensores">Activar Sensores</button>
             <p class="helper">En iPhone, acepta el permiso de movimiento cuando aparezca.</p>
         </section>
 
-        <section id="sensor-data" class="card reading-card is-hidden">
-            <p class="reading-label">Inclinación actual</p>
-            <div class="tilt-display">
-                <span id="tilt-value">0</span>
-                <span class="tilt-unit">°</span>
+        <section id="datos-sensor" class="card tarjeta-lectura is-hidden">
+            <p class="etiqueta-lectura">Inclinación actual</p>
+            <div class="visor-inclinacion">
+                <span id="valor-inclinacion">0</span>
+                <span class="unidad-inclinacion">°</span>
             </div>
-            <p id="status" class="status-text">Enviando datos al PC...</p>
+            <p id="estado-inclinacion" class="estado-inclinacion">Enviando datos al PC...</p>
             <p class="helper">Mantén el móvil estable unos segundos para una lectura más limpia.</p>
         </section>
         
-        <div class="footer-note">Modo sensor móvil conectado por Socket.IO</div>
+        <div class="nota-pie">Modo sensor móvil conectado por Socket.IO</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

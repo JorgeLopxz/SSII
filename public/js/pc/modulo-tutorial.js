@@ -1,10 +1,10 @@
-export const createTutorialModule = async () => {
+export const crearModuloTutorial = async () => {
     const visorManual = document.getElementById('visor-manual');
-    const estadoManual = document.getElementById('estado-manual');
+    const estadoManual = document.getElementById('contador-manual');
     const manualPanel = document.getElementById('subpanel-manual');
-    const manualImagesInput = document.getElementById('manual-images-input');
+    const manualImagesInput = document.getElementById('entrada-imagenes-manual');
     const visorVideo = document.getElementById('visor-video');
-    const videoUrlButton = document.getElementById('btn-video-url');
+    const videoUrlButton = document.getElementById('btn-url-video');
     const video = document.getElementById('video-demo');
     const estadoVideo = document.getElementById('estado-video');
 
@@ -27,7 +27,7 @@ export const createTutorialModule = async () => {
             visorManual.innerHTML = '';
 
             const emptyNode = document.createElement('p');
-            emptyNode.className = 'manual-empty-text';
+            emptyNode.className = 'texto-manual-vacio';
             emptyNode.innerText = 'Adjunta fotos del manual para comenzar.';
             visorManual.appendChild(emptyNode);
 
@@ -44,16 +44,16 @@ export const createTutorialModule = async () => {
 
         if (imageSource) {
             const imageNode = document.createElement('img');
-            imageNode.className = 'manual-step-image';
+            imageNode.className = 'imagen-manual';
             imageNode.alt = `Foto del manual ${currentPage}`;
             imageNode.src = imageSource;
 
             if (direction > 0) {
-                imageNode.classList.add('manual-slide-next');
+                imageNode.classList.add('manual-deslizar-siguiente');
             }
 
             if (direction < 0) {
-                imageNode.classList.add('manual-slide-prev');
+                imageNode.classList.add('manual-deslizar-anterior');
             }
 
             visorManual.appendChild(imageNode);
@@ -464,7 +464,7 @@ export const createTutorialModule = async () => {
 
     if (manualPanel) {
         manualPanel.addEventListener('click', (event) => {
-            if (event.target.id === 'manual-images-input') {
+            if (event.target.id === 'entrada-imagenes-manual') {
                 return;
             }
             attachManualImages();

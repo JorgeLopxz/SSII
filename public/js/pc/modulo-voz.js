@@ -1,5 +1,5 @@
-import { convertUnits, normalizeUnit } from './converter.js';
-import { cancelSpokenFeedback, showFeedback, speakFeedback } from './feedback.js';
+import { convertUnits, normalizeUnit } from './conversor.js';
+import { cancelarRetroalimentacionHablada, mostrarRetroalimentacion, hablarRetroalimentacion } from './retroalimentacion.js';
 
 const NUMBER_WORDS = {
     cero: 0,
@@ -102,12 +102,12 @@ const removeConverterNoise = (text) => {
         .trim();
 };
 
-export const initVoiceModule = (tutorialApi) => {
-    const btnMicro = document.getElementById('btn-micro');
-    const btnStopMicro = document.getElementById('btn-stop-micro');
+export const inicializarModuloVoz = (tutorialApi) => {
+    const btnMicro = document.getElementById('btn-microfono');
+    const btnStopMicro = document.getElementById('btn-detener-microfono');
     const heardText = document.getElementById('texto-escuchado');
     const converterResult = document.getElementById('resultado-conversor');
-    const micStatus = document.getElementById('estado-micro');
+    const micStatus = document.getElementById('estado-microfono');
 
     let micActive = false;
     let manualStop = false;
@@ -117,26 +117,26 @@ export const initVoiceModule = (tutorialApi) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     const updateMicStatus = (status, message) => {
-        micStatus.className = `estado-micro estado-${status}`;
+        micStatus.className = `estado-microfono estado-${status}`;
         micStatus.innerText = message;
     };
 
     const respond = (message, shouldSpeak = true) => {
-        showFeedback(message);
+        mostrarRetroalimentacion(message);
 
         if (!shouldSpeak) {
             return;
         }
 
         isSpeakingFeedback = true;
-        speakFeedback(message, () => {
+        hablarRetroalimentacion(message, () => {
             isSpeakingFeedback = false;
         });
     };
 
     if (!SpeechRecognition) {
         heardText.innerText = 'Tu navegador no soporta reconocimiento de voz. Usa Chrome.';
-        showFeedback('Reconocimiento de voz no disponible en este navegador.');
+        mostrarRetroalimentacion('Reconocimiento de voz no disponible en este navegador.');
         updateMicStatus('error', 'No compatible');
         btnMicro.classList.add('is-hidden');
         btnStopMicro.classList.add('is-hidden');
@@ -158,7 +158,7 @@ export const initVoiceModule = (tutorialApi) => {
         keepListening = false;
         manualStop = true;
         recognition.stop();
-        cancelSpokenFeedback();
+        cancelarRetroalimentacionHablada();
         isSpeakingFeedback = false;
         heardText.innerText = '"Microfono apagado"';
         respond(message, true);
@@ -375,7 +375,7 @@ export const initVoiceModule = (tutorialApi) => {
         }
 
         if (!recognizedCommand) {
-            respond('Comando no reconocido. Prueba: reproduce, pausa, adelanta 10, ve al minuto 2, sube volumen o convierte.', false);
+            respond('Comando no reconocido. Prueba: reproduce, pausa, adelanta 10, ve al minuto 2, sube volumen, convierte, o di "silencio" para detener el micrófono.', false);
         }
 
         if (micActive) {

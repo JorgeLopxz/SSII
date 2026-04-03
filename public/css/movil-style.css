@@ -88,11 +88,11 @@ h1 {
 	padding: 18px;
 }
 
-.setup-card {
+.tarjeta-configuracion {
 	margin-bottom: 16px;
 }
 
-#start-btn {
+#btn-iniciar-sensores {
 	width: 100%;
 	border: 0;
 	border-radius: 14px;
@@ -109,20 +109,20 @@ h1 {
 	transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
-#start-btn:hover {
+#btn-iniciar-sensores:hover {
 	transform: translateY(-1px);
 	box-shadow: 0 12px 20px rgba(201, 99, 21, 0.28);
 }
 
-#start-btn:active {
+#btn-iniciar-sensores:active {
 	transform: translateY(1px) scale(0.995);
 }
 
-.reading-card {
+.tarjeta-lectura {
 	text-align: center;
 }
 
-.reading-label {
+.etiqueta-lectura {
 	margin: 0;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
@@ -130,7 +130,7 @@ h1 {
 	font-size: 0.82rem;
 }
 
-.tilt-display {
+.visor-inclinacion {
 	margin-top: 10px;
 	display: inline-flex;
 	align-items: baseline;
@@ -141,7 +141,7 @@ h1 {
 	background: rgba(255, 248, 236, 0.9);
 }
 
-#tilt-value {
+#valor-inclinacion {
 	font-family: 'Rajdhani', sans-serif;
 	font-size: clamp(3rem, 15vw, 5.2rem);
 	line-height: 1;
@@ -149,13 +149,13 @@ h1 {
 	color: #50341e;
 }
 
-.tilt-unit {
+.unidad-inclinacion {
 	font-family: 'Rajdhani', sans-serif;
 	font-size: clamp(1.4rem, 6vw, 2rem);
 	color: #a86f3a;
 }
 
-.status-text {
+.estado-inclinacion {
 	margin: 14px 0 0;
 	font-weight: 600;
 	color: var(--ok);
@@ -168,7 +168,7 @@ h1 {
 	line-height: 1.4;
 }
 
-.footer-note {
+.nota-pie {
 	margin-top: 14px;
 	text-align: center;
 	font-size: 0.78rem;

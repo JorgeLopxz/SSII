@@ -86,7 +86,7 @@ h1 {
     box-shadow: var(--panel-shadow);
 }
 
-.panel-ruler {
+.panel-regla {
     background:
         linear-gradient(rgba(245, 252, 240, 0.92), rgba(245, 252, 240, 0.92)),
         repeating-linear-gradient(
@@ -98,14 +98,14 @@ h1 {
         );
 }
 
-#nivel-texto {
+#texto-nivel {
     margin: 0 0 22px;
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(1.5rem, 2.4vw, 2.5rem);
     transition: color 0.3s;
 }
 
-#nivel-tubo {
+#tubo-nivel {
     width: min(92%, 860px);
     height: 120px;
     background: linear-gradient(180deg, #6b9d5f, #5a8e4e);
@@ -117,7 +117,7 @@ h1 {
     transition: border-color 0.3s;
 }
 
-#nivel-tubo::before {
+#tubo-nivel::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -149,7 +149,7 @@ h1 {
         );
 }
 
-#nivel-tubo::after {
+#tubo-nivel::after {
     content: '0          5         10        15        20';
     position: absolute;
     top: 8px;
@@ -166,7 +166,7 @@ h1 {
     white-space: nowrap;
 }
 
-#nivel-burbuja {
+#burbuja-nivel {
     width: 94px;
     height: 94px;
     background: radial-gradient(circle at 30% 28%, #f5f6f7 0%, #ced5db 55%, #8f98a2 100%);
@@ -180,8 +180,8 @@ h1 {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 5px 12px rgba(76, 110, 70, 0.2);
 }
 
-#nivel-burbuja::before,
-#nivel-burbuja::after {
+#burbuja-nivel::before,
+#burbuja-nivel::after {
     content: '';
     position: absolute;
     left: 50%;
@@ -190,13 +190,13 @@ h1 {
     background: rgba(62, 70, 79, 0.9);
 }
 
-#nivel-burbuja::before {
+#burbuja-nivel::before {
     width: 48px;
     height: 6px;
     border-radius: 3px;
 }
 
-#nivel-burbuja::after {
+#burbuja-nivel::after {
     width: 6px;
     height: 30px;
     border-radius: 3px;
@@ -220,8 +220,8 @@ h1 {
     z-index: 10;
 }
 
-.marca-izq { left: calc(50% - 60px); }
-.marca-der { left: calc(50% + 54px); }
+.marca-izquierda { left: calc(50% - 60px); }
+.marca-derecha { left: calc(50% + 54px); }
 
 .controles-nivel {
     margin-top: 22px;
@@ -231,13 +231,13 @@ h1 {
     flex-wrap: wrap;
 }
 
-.panel-grid {
+.rejilla-paneles {
     display: grid;
     grid-template-columns: 1fr;
     gap: 18px;
 }
 
-.subpanel-wide {
+.subpanel-completo {
     width: 100%;
 }
 
@@ -276,7 +276,7 @@ h1 {
     min-height: 220px;
 }
 
-.manual-step-text {
+.texto-manual {
     margin: 0;
     font-size: clamp(1.05rem, 1.7vw, 1.45rem);
     color: #50361f;
@@ -284,7 +284,7 @@ h1 {
     text-align: left;
 }
 
-.manual-step-image {
+.imagen-manual {
     width: 100%;
     height: auto;
     border-radius: 6px;
@@ -293,15 +293,15 @@ h1 {
     background: rgba(255, 252, 247, 0.85);
 }
 
-.manual-slide-next {
-    animation: manualSlideNext 0.26s ease-out;
+.manual-deslizar-siguiente {
+    animation: manualDeslizarSiguiente 0.26s ease-out;
 }
 
-.manual-slide-prev {
-    animation: manualSlidePrev 0.26s ease-out;
+.manual-deslizar-anterior {
+    animation: manualDeslizarAnterior 0.26s ease-out;
 }
 
-@keyframes manualSlideNext {
+@keyframes manualDeslizarSiguiente {
     from {
         opacity: 0;
         transform: translateX(22px);
@@ -312,7 +312,7 @@ h1 {
     }
 }
 
-@keyframes manualSlidePrev {
+@keyframes manualDeslizarAnterior {
     from {
         opacity: 0;
         transform: translateX(-22px);
@@ -323,14 +323,14 @@ h1 {
     }
 }
 
-.manual-empty-text {
+.texto-manual-vacio {
     margin: 0;
     color: #7a6652;
     font-size: 1.06rem;
     text-align: center;
 }
 
-.subpanel-hint {
+.ayuda-subpanel {
     margin: 10px 0 0;
     color: #6b5744;
     font-size: 0.92rem;
@@ -340,8 +340,9 @@ h1 {
     background: #fff4ea;
     border: 4px solid var(--error);
     font-size: clamp(1.5rem, 3vw, 2.4rem);
-    padding: 8px;
-    min-height: 420px;
+    padding: 0;
+    height: 480px;
+    width: 100%;
 }
 
 #video-demo {
@@ -352,6 +353,7 @@ h1 {
     background: #1a1a1a;
 }
 
+.marco-video-embebido,
 .video-embed-frame {
     width: 100%;
     height: 100%;
@@ -360,11 +362,17 @@ h1 {
     background: #1a1a1a;
 }
 
+.video-embed-frame iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+}
+
 #subpanel-manual {
     cursor: pointer;
 }
 
-.btn-video-url {
+.btn-url-video {
     margin-top: 12px;
     width: 100%;
     min-height: 54px;
@@ -378,7 +386,7 @@ h1 {
     margin: 10px 0 0;
 }
 
-.panel-wood {
+.panel-madera {
     background:
         linear-gradient(rgba(255, 249, 240, 0.95), rgba(255, 249, 240, 0.95)),
         repeating-linear-gradient(
@@ -468,8 +476,8 @@ h1 {
     font-size: 1.02rem;
 }
 
-.estado-micro,
-.estado-sensores {
+.estado-microfono,
+.estado-sensor {
     display: inline-block;
     margin-top: 8px;
     padding: 8px 14px;
@@ -516,7 +524,7 @@ h1 {
         height: 270px;
     }
 
-    .manual-step-image {
+    .imagen-manual {
         height: auto;
     }
 }
@@ -526,11 +534,11 @@ h1 {
         padding: 20px 12px 28px;
     }
 
-    #nivel-tubo {
+    #tubo-nivel {
         height: 98px;
     }
 
-    #nivel-burbuja {
+    #burbuja-nivel {
         width: 78px;
         height: 78px;
         top: 10px;

@@ -1,18 +1,18 @@
 import { crearSocketMovil } from './movil/socket-modulo.js';
 import { iniciarModuloSensores } from './movil/sensor-modulo.js';
 
-const startButton = document.getElementById('start-btn');
-const sensorDataContainer = document.getElementById('sensor-data');
-const tiltValue = document.getElementById('tilt-value');
-const statusText = document.getElementById('status');
+const botonIniciarSensores = document.getElementById('btn-iniciar-sensores');
+const contenedorDatosSensor = document.getElementById('datos-sensor');
+const valorInclinacion = document.getElementById('valor-inclinacion');
+const estadoInclinacion = document.getElementById('estado-inclinacion');
 
 const { socket, registrarRol } = crearSocketMovil();
 
 const moduloSensores = iniciarModuloSensores({
-    botonInicio: startButton,
-    contenedorSensor: sensorDataContainer,
-    valorInclinacion: tiltValue,
-    textoEstado: statusText,
+    botonInicio: botonIniciarSensores,
+    contenedorSensor: contenedorDatosSensor,
+    valorInclinacion,
+    textoEstado: estadoInclinacion,
     onTilt: (tilt) => {
         socket.emit('mobile_tilt_data', { tilt });
     }
@@ -21,14 +21,14 @@ const moduloSensores = iniciarModuloSensores({
 socket.on('connect', () => {
     registrarRol();
     if (moduloSensores.estanSensoresIniciados()) {
-        statusText.innerText = 'Conectado. Enviando datos al PC...';
+        estadoInclinacion.innerText = 'Conectado. Enviando datos al PC...';
     }
 });
 
 socket.on('disconnect', () => {
-    statusText.innerText = 'Sin conexion con el servidor. Reintentando...';
+    estadoInclinacion.innerText = 'Sin conexion con el servidor. Reintentando...';
 });
 
-startButton.addEventListener('click', () => {
+botonIniciarSensores.addEventListener('click', () => {
     moduloSensores.solicitarEIniciar();
 });
