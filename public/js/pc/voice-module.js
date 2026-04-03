@@ -111,6 +111,7 @@ export const initVoiceModule = (tutorialApi) => {
 
     let micActive = false;
     let manualStop = false;
+    let keepListening = false;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -136,9 +137,11 @@ export const initVoiceModule = (tutorialApi) => {
     const stopMic = (message) => {
         if (!micActive) {
             updateMicStatus('idle', 'Microfono apagado');
+            keepListening = false;
             return;
         }
 
+        keepListening = false;
         manualStop = true;
         recognition.stop();
         heardText.innerText = '"Microfono apagado"';
@@ -151,6 +154,7 @@ export const initVoiceModule = (tutorialApi) => {
             return;
         }
 
+        keepListening = true;
         try {
             recognition.start();
         } catch (error) {
@@ -237,7 +241,43 @@ export const initVoiceModule = (tutorialApi) => {
             recognizedCommand = true;
         }
 
-        if (includesAny(transcript, ['silencio', 'apaga microfono', 'deten microfono'])) {
+        const minuteMatch = transcript.match(/(?:ve|ir|vete|salta|mueve)(?:\s+al?)?\s+minut(?:o|os)\s+([a-z0-9.,]+)/i);
+        if (minuteMatch) {
+            const minuteValue = parseSpokenNumber(minuteMatch[1]);
+            if (Number.isFinite(minuteValue) && minuteValue >= 0) {
+                const output = tutorialApi.goToTime(minuteValue * 60);
+                showFeedback(output.message);
+            } else {
+                showFeedback('No he entendido el minuto indicado.');
+            }
+            recognizedCommand = true;
+        }
+
+        const secondMatch = transcript.match(/(?:ve|ir|vete|salta|mueve)(?:\s+al?)?\s+segund(?:o|os)\s+([a-z0-9.,]+)/i);
+        if (secondMatch) {
+            const secondValue = parseSpokenNumber(secondMatch[1]);
+            if (Number.isFinite(secondValue) && secondValue >= 0) {
+                const output = tutorialApi.goToTime(secondValue);
+                showFeedback(output.message);
+            } else {
+                showFeedback('No he entendido el segundo indicado.');
+            }
+            recognizedCommand = true;
+        }
+
+        if (includesAny(transcript, ['sube volumen', 'aumenta volumen', 'mas volumen'])) {
+            const output = tutorialApi.changeVolume(0.1);
+            showFeedback(output.message);
+            recognizedCommand = true;
+        }
+
+        if (includesAny(transcript, ['baja volumen', 'disminuye volumen', 'menos volumen'])) {
+            const output = tutorialApi.changeVolume(-0.1);
+            showFeedback(output.message);
+            recognizedCommand = true;
+        }
+
+        if (includesAny(transcript, ['silencio', 'apaga microfono', 'deten microfono', 'detener escucha', 'deja de escuchar'])) {
             stopMic('Microfono apagado por comando de voz.');
             recognizedCommand = true;
         }
@@ -315,7 +355,7 @@ export const initVoiceModule = (tutorialApi) => {
         }
 
         if (!recognizedCommand) {
-            showFeedback('Comando no reconocido. Usa siguiente, atras, reproduce, pausa, adelanta 10, retrocede 10 o convierte.');
+            showFeedback('Comando no reconocido. Prueba: reproduce, pausa, adelanta 10, ve al minuto 2, sube volumen o convierte.');
         }
 
         if (micActive) {
@@ -341,13 +381,23 @@ export const initVoiceModule = (tutorialApi) => {
 
     recognition.onend = () => {
         micActive = false;
+
+        if (keepListening && !manualStop) {
+            window.setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (error) {
+                    console.warn('No se pudo reiniciar el microfono automaticamente:', error);
+                }
+            }, 180);
+            updateMicStatus('listening', 'Escuchando...');
+            showFeedback('Escucha continua activa.');
+            return;
+        }
+
         btnMicro.innerText = 'Activar Microfono';
         btnMicro.classList.remove('is-listening');
         btnStopMicro.classList.add('is-hidden');
-
-        if (!manualStop) {
-            showFeedback('El microfono se ha detenido por inactividad. Pulsa Activar Microfono para continuar.');
-        }
 
         manualStop = false;
         updateMicStatus('idle', 'Microfono apagado');
