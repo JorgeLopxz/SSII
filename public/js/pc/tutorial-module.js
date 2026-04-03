@@ -8,38 +8,36 @@ export const createTutorialModule = async () => {
     const video = document.getElementById('video-demo');
     const estadoVideo = document.getElementById('estado-video');
 
-    let manualSteps = [];
     let currentPage = 1;
     let manualImages = [];
     let manualImageUrls = [];
+    let direction = 0;
 
     let useEmbeddedPlayer = false;
     let embeddedHost = null;
     let youtubePlayer = null;
     let youtubeApiPromise = null;
 
-    try {
-        const response = await fetch('/data/manual.json', { cache: 'no-store' });
-        if (response.ok) {
-            const payload = await response.json();
-            if (Array.isArray(payload.steps)) {
-                manualSteps = payload.steps.map((step) => String(step));
-            }
-        }
-    } catch (error) {
-        console.warn('No se pudo cargar manual.json, se usa sin pasos de ejemplo.', error);
-    }
-
-    const getTotalPages = () => {
-        return Math.max(manualImages.length, 1);
-    };
+    const getTotalPages = () => manualImages.length;
 
     const renderManual = () => {
         const totalPages = getTotalPages();
+        if (totalPages === 0) {
+            currentPage = 0;
+            visorManual.innerHTML = '';
+
+            const emptyNode = document.createElement('p');
+            emptyNode.className = 'manual-empty-text';
+            emptyNode.innerText = 'Adjunta fotos del manual para comenzar.';
+            visorManual.appendChild(emptyNode);
+
+            estadoManual.innerText = '0/0';
+            return;
+        }
+
         currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
         const index = currentPage - 1;
-        const stepText = manualImages.length > 0 ? (manualSteps[index] || '') : '';
         const imageSource = manualImages[index] || null;
 
         visorManual.innerHTML = '';
@@ -47,26 +45,22 @@ export const createTutorialModule = async () => {
         if (imageSource) {
             const imageNode = document.createElement('img');
             imageNode.className = 'manual-step-image';
-            imageNode.alt = `Foto del paso ${currentPage}`;
+            imageNode.alt = `Foto del manual ${currentPage}`;
             imageNode.src = imageSource;
+
+            if (direction > 0) {
+                imageNode.classList.add('manual-slide-next');
+            }
+
+            if (direction < 0) {
+                imageNode.classList.add('manual-slide-prev');
+            }
+
             visorManual.appendChild(imageNode);
         }
 
-        if (stepText) {
-            const textNode = document.createElement('p');
-            textNode.className = 'manual-step-text';
-            textNode.innerText = stepText;
-            visorManual.appendChild(textNode);
-        }
-
-        if (!imageSource && !stepText) {
-            const emptyNode = document.createElement('p');
-            emptyNode.className = 'manual-empty-text';
-            emptyNode.innerText = 'Adjunta fotos o contenido del manual para empezar.';
-            visorManual.appendChild(emptyNode);
-        }
-
-        estadoManual.innerText = `Pagina ${currentPage}`;
+        estadoManual.innerText = `${currentPage}/${totalPages}`;
+        direction = 0;
     };
 
     const flashManual = (color) => {
@@ -78,15 +72,17 @@ export const createTutorialModule = async () => {
 
     const nextManualStep = () => {
         const totalPages = getTotalPages();
-        if (manualImages.length === 0) {
+        if (totalPages === 0) {
             return { ok: false, message: 'No hay paginas cargadas en el manual.' };
         }
 
         if (currentPage < totalPages) {
+            const fromPage = currentPage;
             currentPage += 1;
+            direction = 1;
             renderManual();
             flashManual('#d8f0cf');
-            return { ok: true, message: 'He avanzado al siguiente paso del manual.' };
+            return { ok: true, message: `He pasado de la pagina ${fromPage} a la ${currentPage}.` };
         }
 
         return { ok: false, message: 'Ya estas en la ultima pagina cargada.' };
@@ -94,10 +90,12 @@ export const createTutorialModule = async () => {
 
     const previousManualStep = () => {
         if (currentPage > 1) {
+            const fromPage = currentPage;
             currentPage -= 1;
+            direction = -1;
             renderManual();
             flashManual('#f4d8d3');
-            return { ok: true, message: 'He retrocedido al paso anterior del manual.' };
+            return { ok: true, message: `He pasado de la pagina ${fromPage} a la ${currentPage}.` };
         }
 
         return { ok: false, message: 'Ya estas en la primera pagina.' };

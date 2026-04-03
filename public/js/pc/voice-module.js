@@ -1,5 +1,5 @@
 import { convertUnits, normalizeUnit } from './converter.js';
-import { showFeedback } from './feedback.js';
+import { cancelSpokenFeedback, showFeedback, speakFeedback } from './feedback.js';
 
 const NUMBER_WORDS = {
     cero: 0,
@@ -112,12 +112,26 @@ export const initVoiceModule = (tutorialApi) => {
     let micActive = false;
     let manualStop = false;
     let keepListening = false;
+    let isSpeakingFeedback = false;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     const updateMicStatus = (status, message) => {
         micStatus.className = `estado-micro estado-${status}`;
         micStatus.innerText = message;
+    };
+
+    const respond = (message, shouldSpeak = true) => {
+        showFeedback(message);
+
+        if (!shouldSpeak) {
+            return;
+        }
+
+        isSpeakingFeedback = true;
+        speakFeedback(message, () => {
+            isSpeakingFeedback = false;
+        });
     };
 
     if (!SpeechRecognition) {
@@ -144,13 +158,15 @@ export const initVoiceModule = (tutorialApi) => {
         keepListening = false;
         manualStop = true;
         recognition.stop();
+        cancelSpokenFeedback();
+        isSpeakingFeedback = false;
         heardText.innerText = '"Microfono apagado"';
-        showFeedback(message);
+        respond(message, true);
     };
 
     btnMicro.addEventListener('click', () => {
         if (micActive) {
-            showFeedback('El microfono ya esta activo.');
+            respond('El microfono ya esta activo.', false);
             return;
         }
 
@@ -160,7 +176,7 @@ export const initVoiceModule = (tutorialApi) => {
         } catch (error) {
             console.error('No se pudo iniciar el reconocimiento:', error);
             updateMicStatus('error', 'Error al iniciar');
-            showFeedback('No se pudo activar el microfono. Intentalo de nuevo.');
+            respond('No se pudo activar el microfono. Intentalo de nuevo.', false);
         }
     });
 
@@ -176,6 +192,10 @@ export const initVoiceModule = (tutorialApi) => {
             return;
         }
 
+        if (isSpeakingFeedback) {
+            return;
+        }
+
         const originalTranscript = result[0].transcript.trim();
         const transcript = normalizeText(originalTranscript);
 
@@ -187,13 +207,13 @@ export const initVoiceModule = (tutorialApi) => {
 
         if (includesAny(transcript, ['siguiente', 'avanza', 'continua'])) {
             const output = tutorialApi.nextManualStep();
-            showFeedback(output.message);
+            respond(output.message, true);
             recognizedCommand = true;
         }
 
         if (includesAny(transcript, ['atras', 'retrocede', 'anterior'])) {
             const output = tutorialApi.previousManualStep();
-            showFeedback(output.message);
+            respond(output.message, true);
             recognizedCommand = true;
         }
 
@@ -208,7 +228,7 @@ export const initVoiceModule = (tutorialApi) => {
             'play'
         ])) {
             tutorialApi.playVideo().then((output) => {
-                showFeedback(output.message);
+                respond(output.message, true);
             });
             recognizedCommand = true;
         }
@@ -225,19 +245,19 @@ export const initVoiceModule = (tutorialApi) => {
             'stop video'
         ])) {
             const output = tutorialApi.pauseVideo();
-            showFeedback(output.message);
+            respond(output.message, true);
             recognizedCommand = true;
         }
 
         if (includesAny(transcript, ['adelanta 10', 'avanza 10', 'adelantar 10', 'mas 10 segundos', 'avance 10 segundos'])) {
             const output = tutorialApi.seekVideo(10);
-            showFeedback(output.message);
+            respond(output.message, true);
             recognizedCommand = true;
         }
 
         if (includesAny(transcript, ['retrocede 10', 'atras 10', 'retroceder 10', 'retrasar 10', 'menos 10 segundos'])) {
             const output = tutorialApi.seekVideo(-10);
-            showFeedback(output.message);
+            respond(output.message, true);
             recognizedCommand = true;
         }
 
@@ -246,9 +266,9 @@ export const initVoiceModule = (tutorialApi) => {
             const minuteValue = parseSpokenNumber(minuteMatch[1]);
             if (Number.isFinite(minuteValue) && minuteValue >= 0) {
                 const output = tutorialApi.goToTime(minuteValue * 60);
-                showFeedback(output.message);
+                respond(output.message, true);
             } else {
-                showFeedback('No he entendido el minuto indicado.');
+                respond('No he entendido el minuto indicado.', true);
             }
             recognizedCommand = true;
         }
@@ -258,22 +278,22 @@ export const initVoiceModule = (tutorialApi) => {
             const secondValue = parseSpokenNumber(secondMatch[1]);
             if (Number.isFinite(secondValue) && secondValue >= 0) {
                 const output = tutorialApi.goToTime(secondValue);
-                showFeedback(output.message);
+                respond(output.message, true);
             } else {
-                showFeedback('No he entendido el segundo indicado.');
+                respond('No he entendido el segundo indicado.', true);
             }
             recognizedCommand = true;
         }
 
         if (includesAny(transcript, ['sube volumen', 'aumenta volumen', 'mas volumen'])) {
             const output = tutorialApi.changeVolume(0.1);
-            showFeedback(output.message);
+            respond(output.message, true);
             recognizedCommand = true;
         }
 
         if (includesAny(transcript, ['baja volumen', 'disminuye volumen', 'menos volumen'])) {
             const output = tutorialApi.changeVolume(-0.1);
-            showFeedback(output.message);
+            respond(output.message, true);
             recognizedCommand = true;
         }
 
@@ -327,7 +347,7 @@ export const initVoiceModule = (tutorialApi) => {
 
                 if (!Number.isFinite(value)) {
                     converterResult.innerText = "No he entendido el numero. Prueba con '1' o 'uno'.";
-                    showFeedback('Numero no reconocido en el comando de conversion.');
+                    respond('Numero no reconocido en el comando de conversion.', true);
                     recognizedCommand = true;
                     if (micActive) {
                         updateMicStatus('listening', 'Escuchando...');
@@ -341,21 +361,21 @@ export const initVoiceModule = (tutorialApi) => {
 
                 if (resultValue !== null) {
                     converterResult.innerText = `${value} ${match[2]} = ${resultValue.toFixed(2)} ${match[3]}`;
-                    showFeedback('Conversion calculada correctamente.');
+                    respond(`${value} ${match[2]} son ${resultValue.toFixed(2)} ${match[3]}.`, true);
                 } else {
                     converterResult.innerText = `No se convertir de ${match[2]} a ${match[3]}.`;
-                    showFeedback('No reconozco esa conversion. Prueba otra combinacion.');
+                    respond('No reconozco esa conversion. Prueba otra combinacion.', true);
                 }
             } else {
                 converterResult.innerText = "No te he entendido. Prueba con: 'pasa 5 metros a centimetros'.";
-                showFeedback('Formato de conversion no valido.');
+                respond('Formato de conversion no valido.', true);
             }
 
             recognizedCommand = true;
         }
 
         if (!recognizedCommand) {
-            showFeedback('Comando no reconocido. Prueba: reproduce, pausa, adelanta 10, ve al minuto 2, sube volumen o convierte.');
+            respond('Comando no reconocido. Prueba: reproduce, pausa, adelanta 10, ve al minuto 2, sube volumen o convierte.', false);
         }
 
         if (micActive) {
@@ -366,7 +386,7 @@ export const initVoiceModule = (tutorialApi) => {
     recognition.onerror = (event) => {
         console.error('Error de voz:', event.error);
         updateMicStatus('error', 'Error de reconocimiento');
-        showFeedback(`Error de voz (${event.error}). Prueba a reiniciar el microfono.`);
+        respond(`Error de voz (${event.error}). Prueba a reiniciar el microfono.`, false);
     };
 
     recognition.onstart = () => {
@@ -376,7 +396,7 @@ export const initVoiceModule = (tutorialApi) => {
         btnMicro.classList.add('is-listening');
         btnStopMicro.classList.remove('is-hidden');
         updateMicStatus('listening', 'Escuchando...');
-        showFeedback('Microfono activo. Esperando comandos.');
+        respond('Microfono activo. Esperando comandos.', false);
     };
 
     recognition.onend = () => {
@@ -391,7 +411,7 @@ export const initVoiceModule = (tutorialApi) => {
                 }
             }, 180);
             updateMicStatus('listening', 'Escuchando...');
-            showFeedback('Escucha continua activa.');
+            respond('Escucha continua activa.', false);
             return;
         }
 
