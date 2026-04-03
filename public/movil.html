@@ -19,7 +19,7 @@
             <p class="helper">En iPhone, acepta el permiso de movimiento cuando aparezca.</p>
         </section>
 
-        <section id="sensor-data" class="card reading-card" style="display: none;">
+        <section id="sensor-data" class="card reading-card is-hidden">
             <p class="reading-label">Inclinación actual</p>
             <div class="tilt-display">
                 <span id="tilt-value">0</span>
@@ -33,6 +33,6 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="js/movil-app.js"></script>
+    <script type="module" src="js/movil-app.js"></script>
 </body>
 </html>

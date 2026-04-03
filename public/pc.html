@@ -29,20 +29,24 @@
     </section>
 
     <section id="panel-tutorial" class="panel panel-grid">
-        
-        <article class="subpanel">
+        <article class="subpanel subpanel-wide" id="subpanel-video">
+            <h3><span class="icon-video">▶</span> Vídeo Explicativo</h3>
+            <div id="visor-video" class="visor visor-video">
+                <video id="video-demo" preload="metadata" controls playsinline muted src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"></video>
+            </div>
+            <p id="estado-video" class="estado-subpanel">Pausado</p>
+            <button id="btn-video-url" class="btn btn-primary btn-video-url">Cambiar URL del vídeo</button>
+            <p class="subpanel-hint">Puedes pegar MP4 directo o un enlace de YouTube.</p>
+        </article>
+
+        <article class="subpanel" id="subpanel-manual">
             <h3><span class="icon-manual">📋</span> Manual de Montaje</h3>
             <div id="visor-manual" class="visor visor-manual">
                 Paso 1: Medir madera
             </div>
             <p id="estado-manual" class="estado-subpanel">Página 1 / 5</p>
-        </article>
-
-        <article class="subpanel">
-            <h3><span class="icon-video">▶</span> Vídeo Explicativo</h3>
-            <div id="visor-video" class="visor visor-video">
-                ⏸️ PAUSADO
-            </div>
+            <p class="subpanel-hint">Haz clic para adjuntar fotos del manual físico.</p>
+            <input id="manual-images-input" type="file" accept="image/*" multiple hidden>
         </article>
     </section>
 
@@ -54,19 +58,19 @@
             <button id="btn-micro" class="btn btn-primary">
                 Activar Micrófono
             </button>
-            <button id="btn-stop-micro" class="btn btn-secondary" style="display: none;">
+            <button id="btn-stop-micro" class="btn btn-secondary is-hidden">
                 Detener
             </button>
         </div>
         
         <p class="texto-escuchado-wrap">He escuchado: <br> <i id="texto-escuchado">"..."</i></p>
-        <p id="voz-feedback" class="voz-feedback">Di un comando como "siguiente", "pausa" o "convierte 5 pulgadas a cm".</p>
+        <p id="voz-feedback" class="voz-feedback">Di un comando como "siguiente", "pausa", "adelanta 10", "retrocede 10" o "convierte 5 pulgadas a cm".</p>
         
         <div id="resultado-conversor" class="resultado-conversor"></div>
     </section>
    </main>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="js/pc-app.js"></script>
+    <script type="module" src="js/pc-app.js"></script>
 </body>
 </html>
