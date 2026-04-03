@@ -102,7 +102,7 @@ const removeConverterNoise = (text) => {
         .trim();
 };
 
-export const inicializarModuloVoz = (tutorialApi) => {
+export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
     const btnMicro = document.getElementById('btn-microfono');
     const btnStopMicro = document.getElementById('btn-detener-microfono');
     const heardText = document.getElementById('texto-escuchado');
@@ -150,8 +150,11 @@ export const inicializarModuloVoz = (tutorialApi) => {
 
     const stopMic = (message) => {
         if (!micActive) {
-            updateMicStatus('idle', 'Microfono apagado');
+            updateMicStatus('idle', 'Desactivado');
             keepListening = false;
+            if (moduloGestos && moduloGestos.estaActivo()) {
+                moduloGestos.desactivarGestos();
+            }
             return;
         }
 
@@ -160,23 +163,32 @@ export const inicializarModuloVoz = (tutorialApi) => {
         recognition.stop();
         cancelarRetroalimentacionHablada();
         isSpeakingFeedback = false;
-        heardText.innerText = '"Microfono apagado"';
+        heardText.innerText = '"Asistente detenido"';
         respond(message, true);
+        
+        if (moduloGestos && moduloGestos.estaActivo()) {
+            moduloGestos.desactivarGestos();
+        }
     };
 
     btnMicro.addEventListener('click', () => {
         if (micActive) {
-            respond('El microfono ya esta activo.', false);
+            respond('El asistente ya esta activo.', false);
             return;
         }
 
         keepListening = true;
+        
+        if (moduloGestos) {
+            moduloGestos.activarGestos();
+        }
+        
         try {
             recognition.start();
         } catch (error) {
             console.error('No se pudo iniciar el reconocimiento:', error);
             updateMicStatus('error', 'Error al iniciar');
-            respond('No se pudo activar el microfono. Intentalo de nuevo.', false);
+            respond('No se pudo activar el asistente. Intentalo de nuevo.', false);
         }
     });
 
@@ -392,11 +404,11 @@ export const inicializarModuloVoz = (tutorialApi) => {
     recognition.onstart = () => {
         micActive = true;
         manualStop = false;
-        btnMicro.innerText = 'Escuchando...';
+        btnMicro.innerText = 'Asistente activo...';
         btnMicro.classList.add('is-listening');
         btnStopMicro.classList.remove('is-hidden');
-        updateMicStatus('listening', 'Escuchando...');
-        respond('Microfono activo. Esperando comandos.', false);
+        updateMicStatus('listening', 'Activo (Voz + Gestos)');
+        respond('Asistente multimodal activo. Puedes usar voz o gestos.', false);
     };
 
     recognition.onend = () => {

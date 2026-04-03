@@ -17,6 +17,7 @@ export const crearModuloTutorial = async () => {
     let embeddedHost = null;
     let youtubePlayer = null;
     let youtubeApiPromise = null;
+    let cambiandoFuenteVideo = false;
 
     const getTotalPages = () => manualImages.length;
 
@@ -156,6 +157,28 @@ export const crearModuloTutorial = async () => {
         return youtubeApiPromise;
     };
 
+    const limpiarEmbedsDuplicados = () => {
+        if (!visorVideo) {
+            return;
+        }
+
+        const hosts = visorVideo.querySelectorAll('.video-embed-frame');
+        hosts.forEach((node) => {
+            if (node !== embeddedHost) {
+                node.remove();
+            }
+        });
+
+        const iframes = visorVideo.querySelectorAll('iframe');
+        iframes.forEach((iframe) => {
+            const src = (iframe.getAttribute('src') || '').toLowerCase();
+            const parentIsHost = iframe.parentElement && iframe.parentElement.classList.contains('video-embed-frame');
+            if (!parentIsHost && (src.includes('youtube.com') || src.includes('youtu.be'))) {
+                iframe.remove();
+            }
+        });
+    };
+
     const resetToHtml5Player = () => {
         useEmbeddedPlayer = false;
 
@@ -169,6 +192,8 @@ export const crearModuloTutorial = async () => {
             embeddedHost = null;
         }
 
+        limpiarEmbedsDuplicados();
+
         if (video) {
             video.classList.remove('is-hidden');
         }
@@ -176,6 +201,8 @@ export const crearModuloTutorial = async () => {
 
     const mountYouTubePlayer = async (youtubeId) => {
         await loadYouTubeApi();
+
+        limpiarEmbedsDuplicados();
 
         const host = document.createElement('div');
         host.className = 'video-embed-frame';
@@ -375,6 +402,10 @@ export const crearModuloTutorial = async () => {
             return { ok: false, message: 'Video no disponible.' };
         }
 
+        if (cambiandoFuenteVideo) {
+            return { ok: false, message: 'Ya se esta cambiando la fuente del video.' };
+        }
+
         const currentValue = useEmbeddedPlayer
             ? (embeddedHost ? embeddedHost.id || 'youtube' : 'youtube')
             : (video.currentSrc || video.src || '');
@@ -389,45 +420,51 @@ export const crearModuloTutorial = async () => {
             return { ok: false, message: 'URL vacia. No se aplicaron cambios.' };
         }
 
-        const youtubeId = parseYouTubeUrl(sanitizedUrl);
-        if (youtubeId) {
-            resetToHtml5Player();
-            useEmbeddedPlayer = true;
+        cambiandoFuenteVideo = true;
 
-            if (video) {
-                video.pause();
-                video.classList.add('is-hidden');
-            }
-
-            try {
-                await mountYouTubePlayer(youtubeId);
-            } catch (error) {
-                console.warn('No se pudo cargar YouTube embebido:', error);
+        try {
+            const youtubeId = parseYouTubeUrl(sanitizedUrl);
+            if (youtubeId) {
                 resetToHtml5Player();
-                if (estadoVideo) {
-                    estadoVideo.innerText = 'No se pudo cargar YouTube';
+                useEmbeddedPlayer = true;
+
+                if (video) {
+                    video.pause();
+                    video.classList.add('is-hidden');
                 }
-                return { ok: false, message: 'No se pudo cargar el video de YouTube.' };
+
+                try {
+                    await mountYouTubePlayer(youtubeId);
+                } catch (error) {
+                    console.warn('No se pudo cargar YouTube embebido:', error);
+                    resetToHtml5Player();
+                    if (estadoVideo) {
+                        estadoVideo.innerText = 'No se pudo cargar YouTube';
+                    }
+                    return { ok: false, message: 'No se pudo cargar el video de YouTube.' };
+                }
+
+                if (estadoVideo) {
+                    estadoVideo.innerText = 'YouTube cargado';
+                }
+                return { ok: true, message: 'URL de YouTube cargada en modo embebido.' };
             }
 
+            if (!looksLikeDirectVideo(sanitizedUrl)) {
+                return { ok: false, message: 'URL no valida para video directo. Usa MP4/WebM/Ogg o enlace de YouTube.' };
+            }
+
+            resetToHtml5Player();
+            video.src = sanitizedUrl;
+            video.load();
             if (estadoVideo) {
-                estadoVideo.innerText = 'YouTube cargado';
+                estadoVideo.innerText = 'URL cargada. Listo para reproducir';
             }
-            return { ok: true, message: 'URL de YouTube cargada en modo embebido.' };
-        }
 
-        if (!looksLikeDirectVideo(sanitizedUrl)) {
-            return { ok: false, message: 'URL no valida para video directo. Usa MP4/WebM/Ogg o enlace de YouTube.' };
+            return { ok: true, message: 'URL de video actualizada correctamente.' };
+        } finally {
+            cambiandoFuenteVideo = false;
         }
-
-        resetToHtml5Player();
-        video.src = sanitizedUrl;
-        video.load();
-        if (estadoVideo) {
-            estadoVideo.innerText = 'URL cargada. Listo para reproducir';
-        }
-
-        return { ok: true, message: 'URL de video actualizada correctamente.' };
     };
 
     const attachManualImages = () => {

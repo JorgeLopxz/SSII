@@ -515,6 +515,67 @@ h1 {
     color: #194d2f;
 }
 
+.estado-gestos {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid rgba(53, 38, 26, 0.12);
+}
+
+.estado-gestos.error {
+    background-color: #f0bab2;
+    color: #6b2117;
+}
+
+.visor-camara {
+    width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    background: #1a1a1a;
+    margin: 14px 0;
+}
+
+.canvas-gestos {
+    width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    background: #1a1a1a;
+    margin: 14px 0;
+    border: 3px solid rgba(138, 90, 45, 0.34);
+}
+
+.acciones-gestos {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.ayuda-gestos {
+    margin: 14px 0 0;
+    padding: 12px;
+    background: rgba(245, 252, 240, 0.7);
+    border-left: 4px solid #2e8b57;
+    border-radius: 4px;
+    font-size: 0.98rem;
+    color: #50361f;
+    line-height: 1.6;
+}
+
+.texto-deteccion-gestos {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(26, 26, 26, 0.86);
+    color: #f7efe4;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+}
+
 @media (max-width: 900px) {
     .visor-video {
         min-height: 300px;

@@ -49,22 +49,43 @@
     </section>
 
     <section id="panel-voz" class="panel panel-madera">
-        <h2><span class="icon-mic">🎙</span> Asistente de Voz</h2>
-        <p><span id="estado-microfono" class="estado-microfono estado-idle">Micrófono apagado</span></p>
+        <h2><span class="icon-mic">🎙</span> Asistente Multimodal</h2>
+        <p><span id="estado-microfono" class="estado-microfono estado-idle">Desactivado</span></p>
         
         <div class="acciones-voz">
             <button id="btn-microfono" class="btn btn-primary">
-                Activar Micrófono
+                Activar Asistente (Voz + Gestos)
             </button>
             <button id="btn-detener-microfono" class="btn btn-secondary is-hidden">
-                Detener
+                Detener Asistente
             </button>
         </div>
+
+        <video id="camara-gestos" class="visor-camara is-hidden" autoplay playsinline muted></video>
+        <canvas id="canvas-gestos" class="canvas-gestos is-hidden"></canvas>
+        <p id="texto-deteccion-gestos" class="texto-deteccion-gestos">Mano: - | Gesto: -</p>
         
         <p class="texto-escuchado-wrap">He escuchado: <br> <i id="texto-escuchado">"..."</i></p>
-        <p id="voz-feedback" class="voz-feedback">Comandos: "reproducir video", "pausar video", "ve al minuto 2", "sube volumen", "detener escucha".</p>
+        <p id="voz-feedback" class="voz-feedback">Comandos: "reproducir", "pausar", "siguiente", "anterior", "sube volumen", "silencio".</p>
         
         <div id="resultado-conversor" class="resultado-conversor"></div>
+
+        <p class="ayuda-gestos">
+            <strong>Mapa de gestos (fijo):</strong><br>
+            👋 Palma abierta → Pausar video<br>
+            👍 Pulgar arriba → Reproducir video<br>
+                    👈 Solo índice lateral hacia tu izquierda → Anterior<br>
+                    👉 Solo índice lateral hacia tu derecha → Siguiente<br>
+            📣 Índice o medio arriba → Subir volumen<br>
+            🔉 Índice o medio abajo → Bajar volumen<br>
+                        ✌️ V lateral hacia tu derecha → Avanzar 10 s<br>
+                        ✌️ V lateral hacia tu izquierda → Retroceder 10 s
+        </p>
+    </section>
+
+    <section id="panel-gestos" class="panel panel-madera is-hidden">
+        <h2><span class="icon-gestos">👐</span> Estado de Gestos</h2>
+        <p><span id="estado-gestos" class="estado-gestos estado-idle">Gestos desactivados</span></p>
     </section>
    </main>
 
