@@ -562,9 +562,44 @@ export const crearModuloGestos = (tutorialApi) => {
         actualizarEstado('Gestos desactivados', 'idle');
     };
 
+    const tomarFoto = () => {
+        try {
+            const canvasTemp = document.createElement('canvas');
+            canvasTemp.width = videoElement.videoWidth || 640;
+            canvasTemp.height = videoElement.videoHeight || 480;
+            const ctxTemp = canvasTemp.getContext('2d');
+
+            // Espejo: voltea horizontalmente para mostrar lo opuesto a como lo ve MediaPipe
+            ctxTemp.translate(canvasTemp.width, 0);
+            ctxTemp.scale(-1, 1);
+            ctxTemp.drawImage(videoElement, 0, 0, canvasTemp.width, canvasTemp.height);
+
+            const imagenBase64 = canvasTemp.toDataURL('image/png');
+
+            const contenedor = document.getElementById('galeria-fotos');
+            if (!contenedor) {
+                console.warn('Contenedor de fotos no encontrado');
+                return false;
+            }
+
+            const imgElement = document.createElement('img');
+            imgElement.src = imagenBase64;
+            imgElement.className = 'foto-capturada';
+            imgElement.alt = `Foto capturada ${new Date().toLocaleTimeString()}`;
+            imgElement.title = `Capturada a las ${new Date().toLocaleTimeString()}`;
+
+            contenedor.appendChild(imgElement);
+            return true;
+        } catch (error) {
+            console.error('Error al capturar foto:', error);
+            return false;
+        }
+    };
+
     return {
         activarGestos,
         desactivarGestos,
-        estaActivo: () => gestosActivos
+        estaActivo: () => gestosActivos,
+        tomarFoto
     };
 };

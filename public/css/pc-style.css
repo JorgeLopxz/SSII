@@ -588,6 +588,63 @@ h1 {
     .imagen-manual {
         height: auto;
     }
+
+    .galeria-fotos {
+        max-height: 300px;
+    }
+}
+
+.galeria-fotos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    background: rgba(245, 252, 240, 0.5);
+    border: 2px dashed rgba(138, 90, 45, 0.28);
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 120px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.foto-capturada {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid rgba(138, 90, 45, 0.3);
+    background: #fff3e0;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.foto-capturada:hover {
+    transform: scale(1.05);
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(218, 122, 46, 0.2);
+}
+
+.galeria-fotos::-webkit-scrollbar {
+    width: 6px;
+}
+
+.galeria-fotos::-webkit-scrollbar-track {
+    background: rgba(138, 90, 45, 0.08);
+    border-radius: 4px;
+}
+
+.galeria-fotos::-webkit-scrollbar-thumb {
+    background: rgba(138, 90, 45, 0.3);
+    border-radius: 4px;
+}
+
+.galeria-fotos::-webkit-scrollbar-thumb:hover {
+    background: rgba(138, 90, 45, 0.5);
+}
+
+#subpanel-fotos {
+    cursor: default;
 }
 
 @media (max-width: 640px) {

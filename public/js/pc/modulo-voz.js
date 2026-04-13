@@ -113,6 +113,8 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
     let manualStop = false;
     let keepListening = false;
     let isSpeakingFeedback = false;
+    let lastError = null;
+    let restartTimeout = null;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -149,7 +151,7 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
     recognition.interimResults = false;
 
     const stopMic = (message) => {
-        if (!micActive) {
+        if (!micActive && !keepListening) {
             updateMicStatus('idle', 'Desactivado');
             keepListening = false;
             if (moduloGestos && moduloGestos.estaActivo()) {
@@ -160,7 +162,19 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
 
         keepListening = false;
         manualStop = true;
-        recognition.stop();
+        lastError = null;
+        
+        if (restartTimeout) {
+            clearTimeout(restartTimeout);
+            restartTimeout = null;
+        }
+        
+        try {
+            recognition.stop();
+        } catch (error) {
+            console.warn('Error deteniendo reconocimiento:', error);
+        }
+        
         cancelarRetroalimentacionHablada();
         isSpeakingFeedback = false;
         heardText.innerText = '"Asistente detenido"';
@@ -172,12 +186,14 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
     };
 
     btnMicro.addEventListener('click', () => {
-        if (micActive) {
+        if (micActive || keepListening) {
             respond('El asistente ya esta activo.', false);
             return;
         }
 
         keepListening = true;
+        manualStop = false;
+        lastError = null;
         
         if (moduloGestos) {
             moduloGestos.activarGestos();
@@ -188,12 +204,13 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
         } catch (error) {
             console.error('No se pudo iniciar el reconocimiento:', error);
             updateMicStatus('error', 'Error al iniciar');
+            keepListening = false;
             respond('No se pudo activar el asistente. Intentalo de nuevo.', false);
         }
     });
 
     btnStopMicro.addEventListener('click', () => {
-        stopMic('Microfono detenido por el usuario.');
+        stopMic('Micrófono detenido por el usuario.');
     });
 
     recognition.onresult = (event) => {
@@ -309,6 +326,32 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
             recognizedCommand = true;
         }
 
+        if (includesAny(transcript, ['fijar nivel', 'confirmar paso', 'confirmar', 'paso confirmado', 'siguiente paso'])) {
+            const visorManual = document.getElementById('visor-manual');
+            if (visorManual) {
+                visorManual.style.backgroundColor = '#4caf50';
+                window.setTimeout(() => {
+                    visorManual.style.backgroundColor = '#fff3e0';
+                }, 280);
+            }
+            respond('Paso confirmado. Puedes continuar.', true);
+            recognizedCommand = true;
+        }
+
+        if (includesAny(transcript, ['toma una foto', 'captura el progreso', 'captura una foto', 'toma foto', 'captura foto', 'foto'])) {
+            if (moduloGestos && typeof moduloGestos.tomarFoto === 'function') {
+                const exito = moduloGestos.tomarFoto();
+                if (exito) {
+                    respond('Foto capturada. Se ha guardado el progreso.', true);
+                } else {
+                    respond('No se pudo capturar la foto. Asegúrate que la cámara esté activa.', true);
+                }
+            } else {
+                respond('La función de captura no está disponible en este momento.', true);
+            }
+            recognizedCommand = true;
+        }
+
         if (includesAny(transcript, ['silencio', 'apaga microfono', 'deten microfono', 'detener escucha', 'deja de escuchar'])) {
             stopMic('Microfono apagado por comando de voz.');
             recognizedCommand = true;
@@ -397,13 +440,29 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
 
     recognition.onerror = (event) => {
         console.error('Error de voz:', event.error);
-        updateMicStatus('error', 'Error de reconocimiento');
-        respond(`Error de voz (${event.error}). Prueba a reiniciar el microfono.`, false);
+        
+        // Ignorar errores no graves o esperados
+        if (event.error === 'no-speech' || event.error === 'aborted') {
+            return; // Sin voz detectada o sesión abortada internamente, ignorar
+        }
+        
+        // Guardar el error para saber si reintentar en onend
+        lastError = event.error;
+        console.warn(`Error grave: ${event.error}`);
+        updateMicStatus('error', `Error: ${event.error}`);
     };
 
     recognition.onstart = () => {
+        console.log('Reconocimiento iniciado');
         micActive = true;
         manualStop = false;
+        lastError = null;
+        
+        if (restartTimeout) {
+            clearTimeout(restartTimeout);
+            restartTimeout = null;
+        }
+        
         btnMicro.innerText = 'Asistente activo...';
         btnMicro.classList.add('is-listening');
         btnStopMicro.classList.remove('is-hidden');
@@ -412,26 +471,54 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
     };
 
     recognition.onend = () => {
+        console.log(`onend: micActive=${micActive}, keepListening=${keepListening}, lastError=${lastError}`);
         micActive = false;
 
-        if (keepListening && !manualStop) {
-            window.setTimeout(() => {
-                try {
-                    recognition.start();
-                } catch (error) {
-                    console.warn('No se pudo reiniciar el microfono automaticamente:', error);
-                }
-            }, 180);
-            updateMicStatus('listening', 'Escuchando...');
-            respond('Escucha continua activa.', false);
+        // Si se detuvo manualmente, finalizar completamente
+        if (manualStop || !keepListening) {
+            console.log('Parando: detenido manualmente');
+            lastError = null;
+            btnMicro.innerText = 'Activar Asistente (Voz + Gestos)';
+            btnMicro.classList.remove('is-listening');
+            btnStopMicro.classList.add('is-hidden');
+            updateMicStatus('idle', 'Micrófono apagado');
             return;
         }
 
-        btnMicro.innerText = 'Activar Microfono';
-        btnMicro.classList.remove('is-listening');
-        btnStopMicro.classList.add('is-hidden');
+        // Si hay error previo grave, reintentar con delay y mostrar aviso
+        if (lastError) {
+            console.log(`Reintentando tras error: ${lastError}`);
+            updateMicStatus('processing', 'Reconectando...');
+            
+            if (restartTimeout) clearTimeout(restartTimeout);
+            
+            restartTimeout = window.setTimeout(() => {
+                if (keepListening && !manualStop) {
+                    try {
+                        recognition.start();
+                    } catch (error) {
+                        console.error('Error al reintentar:', error);
+                        lastError = null;
+                    }
+                }
+                restartTimeout = null;
+            }, 1500);
+            return;
+        }
 
-        manualStop = false;
-        updateMicStatus('idle', 'Microfono apagado');
-    };
-};
+        // Sin error = timeout natural del navegador → reiniciar inmediatamente y en silencio
+        console.log('Reinicio silencioso por timeout natural');
+        if (restartTimeout) clearTimeout(restartTimeout);
+        
+        // Reinicio casi inmediato (50ms) para que no haya gap perceptible
+        restartTimeout = window.setTimeout(() => {
+            if (keepListening && !manualStop) {
+                try {
+                    recognition.start();
+                } catch (error) {
+                    console.warn('Error en reinicio silencioso:', error);
+                }
+            }
+            restartTimeout = null;
+        }, 50);
+};}
