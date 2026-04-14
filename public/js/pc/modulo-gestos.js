@@ -63,8 +63,8 @@ export const crearModuloGestos = (tutorialApi) => {
             hands.setOptions({
                 maxNumHands: 1,
                 modelComplexity: 1,
-                minDetectionConfidence: 0.65,
-                minTrackingConfidence: 0.65
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
             });
 
             hands.onResults(procesarResultadosMano);
@@ -256,19 +256,6 @@ export const crearModuloGestos = (tutorialApi) => {
         }
     };
 
-    const puñoCerrado = (landmarks) => {
-        const dx8 = Math.abs(landmarks[8].x - landmarks[0].x);
-        const dy8 = Math.abs(landmarks[8].y - landmarks[0].y);
-        const dx12 = Math.abs(landmarks[12].x - landmarks[0].x);
-        const dy12 = Math.abs(landmarks[12].y - landmarks[0].y);
-        const dx16 = Math.abs(landmarks[16].x - landmarks[0].x);
-        const dy16 = Math.abs(landmarks[16].y - landmarks[0].y);
-        const dx20 = Math.abs(landmarks[20].x - landmarks[0].x);
-        const dy20 = Math.abs(landmarks[20].y - landmarks[0].y);
-
-        const compacto = (dx8 + dy8 + dx12 + dy12 + dx16 + dy16 + dx20 + dy20) < 1.75;
-        return compacto && !pulgarArriba(landmarks);
-    };
 
     const detectarGesto = (landmarks) => {
         const escalaMano = calcularEscalaMano(landmarks);
@@ -280,6 +267,7 @@ export const crearModuloGestos = (tutorialApi) => {
         const pulgarDown = pulgarAbajo(landmarks);
 
         const soloPulgar = pulgarUp && !indiceExt && !medioExt && !anularExt && !meñiqueExt;
+        const solosPulgarAbajo = pulgarDown && !indiceExt && !medioExt && !anularExt && !meñiqueExt;
         const indiceSolo = indiceExt && !medioExt && !anularExt && !meñiqueExt;
         const gestoV = indiceExt && medioExt && !anularExt && !meñiqueExt;
         const dedosLevantados = [indiceExt, medioExt, anularExt, meñiqueExt].filter(Boolean).length;
@@ -323,6 +311,11 @@ export const crearModuloGestos = (tutorialApi) => {
 
         if (soloPulgar) {
             return { gesto: 'reproducir-video', detalle };
+        }
+
+        // Pulgar abajo solo (otros dedos no extendidos) → confirmar paso
+        if (solosPulgarAbajo) {
+            return { gesto: 'confirmar-paso', detalle };
         }
 
         // Gesto de +/-10s: V lateral (indice + medio).
@@ -403,6 +396,12 @@ export const crearModuloGestos = (tutorialApi) => {
             case 'retroceder-10':
                 tutorialApi.seekVideo(-10);
                 actualizarEstado('⬅ V lateral → Retroceder 10 segundos', 'ok');
+                break;
+            case 'confirmar-paso':
+                if (typeof tutorialApi.confirmarPaso === 'function') {
+                    tutorialApi.confirmarPaso();
+                }
+                actualizarEstado('👎 Pulgar abajo → Paso confirmado', 'ok');
                 break;
         }
     };
@@ -501,6 +500,24 @@ export const crearModuloGestos = (tutorialApi) => {
         rafId = window.requestAnimationFrame(ciclo);
     };
 
+    const GESTOS_INFO = [
+        { emoji: '👋', desc: 'Palma abierta → Pausar vídeo' },
+        { emoji: '👍', desc: 'Pulgar arriba → Reproducir vídeo' },
+        { emoji: '👎', desc: 'Pulgar abajo → Confirmar paso' },
+        { emoji: '👈', desc: 'Índice lateral izquierda → Página anterior' },
+        { emoji: '👉', desc: 'Índice lateral derecha → Siguiente página' },
+        { emoji: '📣', desc: 'Índice/medio apuntando arriba → Subir volumen' },
+        { emoji: '🔉', desc: 'Índice/medio apuntando abajo → Bajar volumen' },
+        { emoji: '✌️', desc: 'V lateral derecha → Avanzar 10 s' },
+        { emoji: '✌️', desc: 'V lateral izquierda → Retroceder 10 s' }
+    ];
+
+    const gerarMapaGestos = () =>
+        '<strong>Gestos disponibles</strong>' +
+        GESTOS_INFO.map(
+            (g) => `<span class="gesto-fila"><span class="gesto-emoji">${g.emoji}</span><span class="gesto-desc">${g.desc}</span></span>`
+        ).join('');
+
     const activarGestos = async () => {
         if (gestosActivos) {
             return;
@@ -533,7 +550,7 @@ export const crearModuloGestos = (tutorialApi) => {
             canvasElement.classList.remove('is-hidden');
         }
         if (helpText) {
-            helpText.innerHTML = '<strong>Mapa de gestos (fijo):</strong><br>👋 Palma abierta → Pausar vídeo<br>👍 Pulgar arriba → Reproducir vídeo<br>👈 Solo índice lateral hacia tu izquierda → Página anterior<br>👉 Solo índice lateral hacia tu derecha → Siguiente página<br>📣 Índice o medio arriba → Subir volumen<br>🔉 Índice o medio abajo → Bajar volumen<br>✌️ V lateral hacia tu derecha → Avanzar 10 s<br>✌️ V lateral hacia tu izquierda → Retroceder 10 s<br><strong>Depuración:</strong> usa el texto de abajo para ver el gesto interpretado.';
+            helpText.innerHTML = gerarMapaGestos();
         }
 
         actualizarEstado('Gestos activos. Mantén el gesto un momento para confirmar.', 'ok');

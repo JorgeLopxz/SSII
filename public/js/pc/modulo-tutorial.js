@@ -376,6 +376,26 @@ export const crearModuloTutorial = async () => {
         return { ok: true, message: `Moviendo video a ${Math.floor(targetSeconds)} segundos.` };
     };
 
+    const setVolume = (level) => {
+        const clamped = Math.max(0, Math.min(1, level));
+        const pct = Math.round(clamped * 100);
+
+        if (useEmbeddedPlayer) {
+            if (!youtubePlayer || typeof youtubePlayer.setVolume !== 'function') {
+                return { ok: false, message: 'Reproductor embebido no listo todavia.' };
+            }
+            youtubePlayer.setVolume(pct);
+            return { ok: true, message: `Volumen fijado al ${pct}%.` };
+        }
+
+        if (!video) {
+            return { ok: false, message: 'Video no disponible.' };
+        }
+
+        video.volume = clamped;
+        return { ok: true, message: `Volumen fijado al ${pct}%.` };
+    };
+
     const changeVolume = (delta) => {
         if (useEmbeddedPlayer) {
             if (!youtubePlayer || typeof youtubePlayer.getVolume !== 'function' || typeof youtubePlayer.setVolume !== 'function') {
@@ -539,6 +559,11 @@ export const crearModuloTutorial = async () => {
 
     renderManual();
 
+    const confirmarPaso = () => {
+        flashManual('#4caf50');
+        return { ok: true, message: 'Paso confirmado. Puedes continuar.' };
+    };
+
     return {
         nextManualStep,
         previousManualStep,
@@ -546,8 +571,10 @@ export const crearModuloTutorial = async () => {
         pauseVideo,
         seekVideo,
         goToTime,
+        setVolume,
         changeVolume,
         promptVideoUrl,
-        attachManualImages
+        attachManualImages,
+        confirmarPaso
     };
 };

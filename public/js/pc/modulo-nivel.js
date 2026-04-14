@@ -119,8 +119,9 @@ export const inicializarModuloNivel = (socket) => {
         inclinacionSuavizada = null;
     }, 1000);
 
-    botonCalibrar.addEventListener('click', () => {
+    const aplicarCalibracion = () => {
         if (ultimaInclinacionBruta === null) {
+            mostrarRetroalimentacion('No hay datos del movil para calibrar.');
             return;
         }
 
@@ -128,11 +129,18 @@ export const inicializarModuloNivel = (socket) => {
         inclinacionSuavizada = 0;
         dibujarNivel(0);
         mostrarRetroalimentacion(`Calibracion aplicada. Offset: ${offsetCalibracion.toFixed(1)}deg`);
-    });
+    };
 
-    botonReiniciarCalibracion.addEventListener('click', () => {
+    const reiniciarCalibracion = () => {
         offsetCalibracion = 0;
         inclinacionSuavizada = null;
         mostrarRetroalimentacion('Calibracion reiniciada.');
-    });
+    };
+
+    botonCalibrar.addEventListener('click', aplicarCalibracion);
+    botonReiniciarCalibracion.addEventListener('click', reiniciarCalibracion);
+
+    // Permite calibrar y reiniciar desde comandos de voz
+    document.addEventListener('calibrar-nivel', aplicarCalibracion);
+    document.addEventListener('reiniciar-calibracion', reiniciarCalibracion);
 };

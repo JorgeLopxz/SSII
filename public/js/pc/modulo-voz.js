@@ -234,19 +234,47 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
 
         let recognizedCommand = false;
 
-        if (includesAny(transcript, ['siguiente', 'avanza', 'continua'])) {
+        // Si la frase menciona explícitamente gestos, cámara u otros módulos del sistema
+        // ignoramos los comandos de medios/navegación para evitar falsos positivos como
+        // "pausar gestos" disparando la pausa del vídeo.
+        const esContextoSistema = includesAny(transcript, ['gesto', 'gestos', 'camara', 'microfono', 'microfon', 'asistente', 'escucha']);
+
+        const esComandoAdelantar10 = !esContextoSistema && (
+            includesAny(transcript, ['adelanta 10', 'avanza 10', 'adelantar 10', 'mas 10 segundos', 'avance 10 segundos'])
+            || /(?:adelanta|avanza|adelantar|avance)\s+(?:10|diez)\b/.test(transcript)
+        );
+
+        const esComandoRetroceder10 = !esContextoSistema && (
+            includesAny(transcript, ['retrocede 10', 'atras 10', 'retroceder 10', 'retrasar 10', 'menos 10 segundos'])
+            || /(?:retrocede|retroceder|atras|retrasar)\s+(?:10|diez)\b/.test(transcript)
+        );
+
+        // Prioridad: los comandos de +/-10 segundos son exclusivos del video.
+        if (esComandoAdelantar10) {
+            const output = tutorialApi.seekVideo(10);
+            respond(output.message, true);
+            recognizedCommand = true;
+        }
+
+        if (!recognizedCommand && esComandoRetroceder10) {
+            const output = tutorialApi.seekVideo(-10);
+            respond(output.message, true);
+            recognizedCommand = true;
+        }
+
+        if (!recognizedCommand && !esContextoSistema && includesAny(transcript, ['siguiente', 'avanza', 'continua'])) {
             const output = tutorialApi.nextManualStep();
             respond(output.message, true);
             recognizedCommand = true;
         }
 
-        if (includesAny(transcript, ['atras', 'retrocede', 'anterior'])) {
+        if (!recognizedCommand && !esContextoSistema && includesAny(transcript, ['atras', 'retrocede', 'anterior'])) {
             const output = tutorialApi.previousManualStep();
             respond(output.message, true);
             recognizedCommand = true;
         }
 
-        if (includesAny(transcript, [
+        if (!esContextoSistema && includesAny(transcript, [
             'reproduce',
             'reproducir',
             'reproduce video',
@@ -262,7 +290,7 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
             recognizedCommand = true;
         }
 
-        if (includesAny(transcript, [
+        if (!esContextoSistema && includesAny(transcript, [
             'pausa',
             'pausar',
             'pausar video',
@@ -274,18 +302,6 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
             'stop video'
         ])) {
             const output = tutorialApi.pauseVideo();
-            respond(output.message, true);
-            recognizedCommand = true;
-        }
-
-        if (includesAny(transcript, ['adelanta 10', 'avanza 10', 'adelantar 10', 'mas 10 segundos', 'avance 10 segundos'])) {
-            const output = tutorialApi.seekVideo(10);
-            respond(output.message, true);
-            recognizedCommand = true;
-        }
-
-        if (includesAny(transcript, ['retrocede 10', 'atras 10', 'retroceder 10', 'retrasar 10', 'menos 10 segundos'])) {
-            const output = tutorialApi.seekVideo(-10);
             respond(output.message, true);
             recognizedCommand = true;
         }
@@ -314,27 +330,35 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
             recognizedCommand = true;
         }
 
-        if (includesAny(transcript, ['sube volumen', 'aumenta volumen', 'mas volumen'])) {
+        // Volumen absoluto: "pon el volumen al 50", "baja el volumen al 20 por ciento", "volumen al 80"
+        const volAbsMatch = transcript.match(
+            /(?:(?:pon|ajusta|fija|establece|sube|baja|coloca|subir|bajar|poner|fijar|ajustar)\s+)?(?:el\s+)?volumen\s+al?\s+([a-z0-9]+)(?:\s+por\s+ciento)?/
+        );
+        if (volAbsMatch) {
+            const pct = parseSpokenNumber(volAbsMatch[1]);
+            if (Number.isFinite(pct) && pct >= 0) {
+                const level = pct > 1 ? pct / 100 : pct;
+                const output = tutorialApi.setVolume(level);
+                respond(output.message, true);
+                recognizedCommand = true;
+            }
+        }
+
+        if (!recognizedCommand && includesAny(transcript, ['sube volumen', 'aumenta volumen', 'mas volumen', 'sube el volumen', 'aumenta el volumen'])) {
             const output = tutorialApi.changeVolume(0.1);
             respond(output.message, true);
             recognizedCommand = true;
         }
 
-        if (includesAny(transcript, ['baja volumen', 'disminuye volumen', 'menos volumen'])) {
+        if (!recognizedCommand && includesAny(transcript, ['baja volumen', 'disminuye volumen', 'menos volumen', 'baja el volumen', 'disminuye el volumen'])) {
             const output = tutorialApi.changeVolume(-0.1);
             respond(output.message, true);
             recognizedCommand = true;
         }
 
-        if (includesAny(transcript, ['fijar nivel', 'confirmar paso', 'confirmar', 'paso confirmado', 'siguiente paso'])) {
-            const visorManual = document.getElementById('visor-manual');
-            if (visorManual) {
-                visorManual.style.backgroundColor = '#4caf50';
-                window.setTimeout(() => {
-                    visorManual.style.backgroundColor = '#fff3e0';
-                }, 280);
-            }
-            respond('Paso confirmado. Puedes continuar.', true);
+        if (includesAny(transcript, ['fijar nivel', 'confirmar paso', 'confirmar', 'paso confirmado'])) {
+            const output = tutorialApi.confirmarPaso();
+            respond(output.message, true);
             recognizedCommand = true;
         }
 
@@ -349,6 +373,18 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
             } else {
                 respond('La función de captura no está disponible en este momento.', true);
             }
+            recognizedCommand = true;
+        }
+
+        if (includesAny(transcript, ['calibrar nivel', 'calibrar', 'establecer cero', 'poner a cero', 'fijar cero'])) {
+            document.dispatchEvent(new CustomEvent('calibrar-nivel'));
+            respond('Calibracion del nivel aplicada.', true);
+            recognizedCommand = true;
+        }
+
+        if (includesAny(transcript, ['reiniciar calibracion', 'reset calibracion', 'quitar calibracion', 'borrar calibracion'])) {
+            document.dispatchEvent(new CustomEvent('reiniciar-calibracion'));
+            respond('Calibracion reiniciada.', true);
             recognizedCommand = true;
         }
 
@@ -430,7 +466,7 @@ export const inicializarModuloVoz = (tutorialApi, moduloGestos) => {
         }
 
         if (!recognizedCommand) {
-            respond('Comando no reconocido. Prueba: reproduce, pausa, adelanta 10, ve al minuto 2, sube volumen, convierte, o di "silencio" para detener el micrófono.', false);
+            respond('Comando no reconocido. Prueba: reproduce, pausa, siguiente, anterior, adelanta 10, volumen al 50, sube volumen, calibrar, confirmar, convierte, o "silencio" para detener.', false);
         }
 
         if (micActive) {

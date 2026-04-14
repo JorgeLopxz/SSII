@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Taller - PC</title>
+    <title>Monitor de Taller – PC</title>
     <link rel="stylesheet" href="css/pc-style.css">
 </head>
 <body>
-   <main class="app-shell">
+  <main class="app-shell">
+
     <header class="app-header">
         <p class="eyebrow">Hands-Free Workshop Assistant</p>
         <h1>Monitor Principal de Montaje</h1>
         <p class="subtitle">Interacciones sin contacto para nivelado, guía de montaje y control por voz.</p>
-        <p><span id="estado-sensor" class="estado-sensor estado-sensor-offline">Sin sensores</span></p>
     </header>
-    
+
+    <!-- Nivelador -->
     <section id="panel-nivel" class="panel panel-regla">
-        <h2 id="texto-nivel">Esperando datos del móvil...</h2>
+        <h2>Nivelador en Tiempo Real</h2>
+        <p id="texto-nivel">Esperando datos del móvil...</p>
         <div id="tubo-nivel">
             <div class="marca marca-izquierda"></div>
             <div class="marca marca-derecha"></div>
@@ -28,36 +30,46 @@
         </div>
     </section>
 
+    <!-- Tutorial: vídeo + manual + galería -->
     <section id="panel-tutorial" class="panel rejilla-paneles">
+
         <article class="subpanel subpanel-completo" id="subpanel-video">
-            <h3><span class="icon-video">▶</span> Vídeo Explicativo</h3>
-            <div id="visor-video" class="visor visor-video">
-                <video id="video-demo" preload="metadata" controls playsinline muted src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"></video>
+            <h3>▶ Vídeo Explicativo</h3>
+            <div id="visor-video" class="visor-video">
+                <video id="video-demo" preload="metadata" controls playsinline muted
+                    src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"></video>
             </div>
             <p id="estado-video" class="estado-subpanel">Pausado</p>
             <button id="btn-url-video" class="btn btn-primary btn-url-video">Cambiar URL del vídeo</button>
-            <p class="ayuda-subpanel">Puedes pegar MP4 directo o un enlace de YouTube.</p>
+            <p class="ayuda-subpanel">Acepta MP4 directo o enlace de YouTube.</p>
         </article>
 
         <article class="subpanel" id="subpanel-manual">
-            <h3><span class="icon-manual">📋</span> Manual de Montaje</h3>
+            <h3>📋 Manual de Montaje</h3>
             <div id="visor-manual" class="visor visor-manual"></div>
             <p id="contador-manual" class="estado-subpanel">0/0</p>
-            <p class="ayuda-subpanel">Haz clic para adjuntar fotos del manual físico.</p>
+            <p class="ayuda-subpanel">Haz clic para adjuntar las fotos del manual físico.</p>
             <input id="entrada-imagenes-manual" type="file" accept="image/*" multiple hidden>
         </article>
 
         <article class="subpanel" id="subpanel-fotos">
-            <h3><span class="icon-camera">📷</span> Galería de Progreso</h3>
+            <h3>📷 Galería de Progreso</h3>
             <div id="galeria-fotos" class="galeria-fotos"></div>
-            <p class="ayuda-subpanel">Di "captura el progreso" o "toma una foto" para guardar una captura.</p>
+            <p class="ayuda-subpanel">Di "toma una foto" para guardar una captura del progreso.</p>
         </article>
+
     </section>
 
-    <section id="panel-voz" class="panel panel-madera">
-        <h2><span class="icon-mic">🎙</span> Asistente Multimodal</h2>
-        <p><span id="estado-microfono" class="estado-microfono estado-idle">Desactivado</span></p>
-        
+    <!-- Asistente multimodal: voz + gestos -->
+    <section id="panel-voz" class="panel panel-asistente">
+        <h2>🎙 Asistente Multimodal</h2>
+
+        <div class="badges-estado">
+            <span id="estado-sensor"  class="estado-sensor  estado-sensor-offline">Sin sensor móvil</span>
+            <span id="estado-microfono" class="estado-microfono estado-idle">Micrófono inactivo</span>
+            <span id="estado-gestos"  class="estado-gestos  estado-idle">Gestos inactivos</span>
+        </div>
+
         <div class="acciones-voz">
             <button id="btn-microfono" class="btn btn-primary">
                 Activar Asistente (Voz + Gestos)
@@ -67,33 +79,34 @@
             </button>
         </div>
 
-        <video id="camara-gestos" class="visor-camara is-hidden" autoplay playsinline muted></video>
+        <video  id="camara-gestos" class="visor-camara  is-hidden" autoplay playsinline muted></video>
         <canvas id="canvas-gestos" class="canvas-gestos is-hidden"></canvas>
-        <p id="texto-deteccion-gestos" class="texto-deteccion-gestos">Mano: - | Gesto: -</p>
-        
-        <p class="texto-escuchado-wrap">He escuchado: <br> <i id="texto-escuchado">"..."</i></p>
-        <p id="voz-feedback" class="voz-feedback">Comandos: "reproducir", "pausar", "siguiente", "anterior", "sube volumen", "silencio".</p>
-        
+        <p id="texto-deteccion-gestos" class="texto-deteccion-gestos">Mano: — | Gesto: —</p>
+
+        <hr class="divisor-panel">
+
+        <p class="texto-escuchado-wrap">He escuchado: <i id="texto-escuchado">"..."</i></p>
+        <p id="voz-feedback" class="voz-feedback">
+            Comandos: "reproducir", "pausar", "siguiente", "anterior", "sube volumen",
+            "volumen al 50", "calibrar", "confirmar", "convierte 5 metros a cm", "silencio".
+        </p>
         <div id="resultado-conversor" class="resultado-conversor"></div>
 
-        <p class="ayuda-gestos">
-            <strong>Mapa de gestos (fijo):</strong><br>
-            👋 Palma abierta → Pausar video<br>
-            👍 Pulgar arriba → Reproducir video<br>
-                    👈 Solo índice lateral hacia tu izquierda → Anterior<br>
-                    👉 Solo índice lateral hacia tu derecha → Siguiente<br>
-            📣 Índice o medio arriba → Subir volumen<br>
-            🔉 Índice o medio abajo → Bajar volumen<br>
-                        ✌️ V lateral hacia tu derecha → Avanzar 10 s<br>
-                        ✌️ V lateral hacia tu izquierda → Retroceder 10 s
-        </p>
+        <div class="ayuda-gestos">
+            <strong>Gestos disponibles</strong>
+            <span class="gesto-fila"><span class="gesto-emoji">👋</span><span class="gesto-desc">Palma abierta → Pausar vídeo</span></span>
+            <span class="gesto-fila"><span class="gesto-emoji">👍</span><span class="gesto-desc">Pulgar arriba → Reproducir vídeo</span></span>
+            <span class="gesto-fila"><span class="gesto-emoji">👎</span><span class="gesto-desc">Pulgar abajo → Confirmar paso</span></span>
+            <span class="gesto-fila"><span class="gesto-emoji">👈</span><span class="gesto-desc">Índice lateral izquierda → Página anterior</span></span>
+            <span class="gesto-fila"><span class="gesto-emoji">👉</span><span class="gesto-desc">Índice lateral derecha → Siguiente página</span></span>
+            <span class="gesto-fila"><span class="gesto-emoji">📣</span><span class="gesto-desc">Índice/medio apuntando arriba → Subir volumen</span></span>
+            <span class="gesto-fila"><span class="gesto-emoji">🔉</span><span class="gesto-desc">Índice/medio apuntando abajo → Bajar volumen</span></span>
+            <span class="gesto-fila"><span class="gesto-emoji">✌️</span><span class="gesto-desc">V lateral derecha → Avanzar 10 s</span></span>
+            <span class="gesto-fila"><span class="gesto-emoji">✌️</span><span class="gesto-desc">V lateral izquierda → Retroceder 10 s</span></span>
+        </div>
     </section>
 
-    <section id="panel-gestos" class="panel panel-madera is-hidden">
-        <h2><span class="icon-gestos">👐</span> Estado de Gestos</h2>
-        <p><span id="estado-gestos" class="estado-gestos estado-idle">Gestos desactivados</span></p>
-    </section>
-   </main>
+  </main>
 
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="js/pc-app.js"></script>
