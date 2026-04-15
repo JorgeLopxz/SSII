@@ -2,6 +2,8 @@
 
 Este proyecto implementa una ecología de dispositivos distribuida para un taller de bricolaje, permitiendo la interacción sin contacto físico mediante comandos de voz, gestos y sensores de movimiento. 
 
+Ha sido realizado por Jorge López Alonso, Tomás Moreno Amores y Álvaro Carrasco Fuentes
+
 El sistema utiliza **Node.js, Express y Socket.IO** para la comunicación en tiempo real entre un ordenador principal (pantalla/monitor) y un teléfono móvil (sensor de nivelación).
 
 ---
