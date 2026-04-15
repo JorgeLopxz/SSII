@@ -39,7 +39,7 @@ Deja esta terminal abierta. El servidor estará escuchando en el puerto 3000.
 Vista del PC: Puedes abrir en el navegador de tu ordenador la ruta http://localhost:3000/pc.html para ver el Monitor Principal (Nivel gigante).
 
 Paso B: Crear el túnel seguro (HTTPS) para el iPhone
-Debido a las estrictas políticas de seguridad de Apple (iOS 13+), Safari bloquea el acceso al giroscopio si la conexión no es HTTPS. Para solucionarlo, creamos un túnel temporal.
+Debido a las estrictas políticas de seguridad de Apple (iOS 13+), Safari bloquea el acceso al giroscopio si la conexión no es HTTPS. Para solucionarlo, creamos un túnel temporal. Aunque no es necesario haciendo esto en Android te aseguras que funcione correctamente también.
 
 Abre una segunda terminal en VS Code y ejecuta:
 
