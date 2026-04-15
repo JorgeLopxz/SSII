@@ -65,9 +65,40 @@ Safari mostrará un aviso nativo del sistema solicitando permiso para acceder a 
 
 ¡Listo! Si mueves el móvil, verás cómo los grados de inclinación se actualizan en la pantalla del iPhone y, simultáneamente, la burbuja del PC se mueve y cambia de color en tiempo real.
 
-🐛 4. Troubleshooting (Solución de problemas)
-La página del móvil se queda en blanco: Asegúrate de haber escrito /movil.html al final de la URL de localtunnel en Safari.
+🏫 4. Uso en la Red de la Universidad (Eduroam)
 
-El PC no se conecta (Firewall): Si estás probando con la IP local (192.168.X.X) en lugar de localtunnel y no carga, revisa que el Firewall de Windows esté permitiendo conexiones públicas y privadas para "Node.js".
+El WiFi universitario bloquea las conexiones que necesita `localtunnel`. En ese caso, usa **Cloudflare Tunnel** como alternativa, que funciona sobre el puerto 443 (HTTPS estándar) y no tiene ese problema.
 
-Redes de la Universidad (Eduroam): Las redes públicas bloquean la conexión entre dispositivos. Usa Localtunnel o comparte Internet desde el móvil al PC.
+### Paso B alternativo: Crear el túnel con Cloudflare
+
+En lugar del comando de localtunnel, ejecuta este en la segunda terminal:
+
+```powershell
+npx cloudflared tunnel --url http://localhost:3000
+```
+
+(Si pregunta si deseas instalar el paquete, pulsa `y`).
+
+Espera unos segundos hasta que aparezca un bloque como este en la terminal:
+
+```
++--------------------------------------------------------------------------------------------+
+|  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
+|  https://palabras-aleatorias.trycloudflare.com                                             |
++--------------------------------------------------------------------------------------------+
+```
+
+Esa es tu URL segura. Úsala exactamente igual que la de localtunnel:
+
+```
+https://palabras-aleatorias.trycloudflare.com/movil.html
+```
+
+> **Nota:** Con Cloudflare Tunnel no aparece la pantalla de advertencia intermedia, la página carga directamente.
+
+---
+
+🐛 5. Troubleshooting (Solución de problemas)
+La página del móvil se queda en blanco: Asegúrate de haber escrito /movil.html al final de la URL del túnel en Safari.
+
+El PC no se conecta (Firewall): Si estás probando con la IP local (192.168.X.X) en lugar del túnel y no carga, revisa que el Firewall de Windows esté permitiendo conexiones públicas y privadas para "Node.js".
